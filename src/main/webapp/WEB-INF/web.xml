@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This web.xml file is not required when using Servlet 3.0 container, 
+	see implementation details http://jersey.java.net/nonav/documentation/latest/jax-rs.html#d4e194 -->
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<!-- Deploy Jersey Servlet at /api -->
+	<servlet>
+
+		<servlet-name>Jersey Web Application</servlet-name>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>es.ua.dlsi.mejorua.api</param-value>
+		</init-param>
+
+		<!-- ¡ INSECURE ! Allow PUT Method to EVERYONE -->
+		<!-- http://www.codereye.com/2010/12/configure-tomcat-to-accept-http-put.html -->
+		<!-- 
+		<init-param>
+			<param-name>readonly</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		 -->
+
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Jersey Web Application</servlet-name>
+		<url-pattern>/api/*</url-pattern>
+	</servlet-mapping>
+	<!-- END - Deploy Jersey Servlet at /api -->
+
+
+	<!-- TODO Implement secure PUT access like below -->
+
+	<!-- Allow PUT Method to admin role example -->
+	<!-- http://www.codereye.com/2010/12/configure-tomcat-to-accept-http-put.html -->
+	<!-- <security-constraint> <web-resource-collection> <web-resource-name>Demo 
+		App</web-resource-name> <url-pattern>/*</url-pattern> <http-method>PUT</http-method> 
+		</web-resource-collection> <auth-constraint> <role-name>admin</role-name> 
+		</auth-constraint> </security-constraint> <login-config> <auth-method>BASIC</auth-method> 
+		<realm-name>Demo App</realm-name> </login-config> <security-role> <description>Role 
+		for restricted resources</description> <role-name>admin</role-name> </security-role> -->
+
+	<!-- Allow Cross Origin requests from ANYONE -->
+	<filter>
+		<filter-name>CorsFilter</filter-name>
+		<filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CorsFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- END - Allow Cross Origin requests from ANYONE -->
+
+</web-app>
