@@ -3,7 +3,6 @@ package es.ua.dlsi.mejorua.api.resources;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -11,15 +10,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import es.ua.dlsi.mejorua.api.business.IncidenciaBO;
-import es.ua.dlsi.mejorua.api.persistance.IncidenciaDAO;
+import es.ua.dlsi.mejorua.api.business.IssueBO;
+import es.ua.dlsi.mejorua.api.util.JSON;
 
 /**
  * Example resource class hosted at the URI path "/myresource"
  */
-@Path("/incidencia/{id}")
-@Produces("application/json; charset=UTF-8")
-public class IncidenciaREST {
+@Path("/issues/{id}")
+@Produces("application/json;charset=UTF-8")
+public class IssueResource {
 
 	@Context
 	UriInfo uri;
@@ -35,81 +34,33 @@ public class IncidenciaREST {
 	public Response get(@PathParam("id") String idString) {
 
 		Response response;
-		String JSON = "";
-		String error = "No se ha encontrado el recurso.";
-
-		/*
-		 * IncidenciaBO incidencia = new IncidenciaBO();
-		 * 
-		 * incidencia.setId(Long.valueOf(idString)); incidencia.setLatitud(1);
-		 * incidencia.setLongitud(2); incidencia.setTermino("Termino");
-		 * incidencia.setAccion("Acción");
-		 */
-
-		// Poblamos "incidencias" con una incidencia 1
-		if (IncidenciaDAO.get(1) == null) {
-			IncidenciaBO incidenciaPrePoblada = new IncidenciaBO();
-			incidenciaPrePoblada.setId(1);
-			incidenciaPrePoblada.setLatitud(1);
-			incidenciaPrePoblada.setLongitud(1);
-			incidenciaPrePoblada.setTermino("Termino pre poblado");
-			incidenciaPrePoblada.setAccion("Acción pre poblada");
-			
-			IncidenciaDAO.save(incidenciaPrePoblada);
-		}
+		String json = "";
+		String error = "Failed to retrieve resource";
 		
-		IncidenciaBO incidencia = IncidenciaDAO.get(Long.valueOf(idString));
+		IssueBO issue = IssueBO.get(Long.valueOf(idString));
 
-		if (incidencia != null) {
-			JSON = incidencia.toJSON();
-			response = Response.ok(JSON).build();
+		if (issue != null) {
+			json = JSON.encode(issue);
+			response = Response.ok(json).build();
 		} else {
 			response = Response.status(404).entity(error).type("text/plain").build();
 		}
 
 		return response;
 	}
-
-	//TODO Solucionar error de unsuported media type al mandar JSON
-	@PUT
-	@Consumes("application/json; charset=UTF-8")
-	public Response put(String resourceJSON) {
-
-		Response response;
-		String error = "No se ha podido crear/modificar el recurso";
-
-		IncidenciaBO incidencia = IncidenciaBO.newFromJSON(resourceJSON);
-
-		if (incidencia != null) {
-			IncidenciaDAO.save(incidencia);
-
-			// TODO Componer la uri con la location del recurso creado
-
-			// String baseUri = uri.getBaseUri().toString();
-			// String resourceUri = baseUri + "incidencia/" +
-			// incidencia.getId();
-			// response = Response.created(resourceUri).build();
-			response = Response.status(201).build();
-		} else {
-			response = Response.status(400).entity(error).type("text/plain").build();
-		}
-
-		return response;
-
-	}
 	
-	//TODO BORRAR ESTO - COPY PASTE DEL @PUT PARA TESTEAR CHROME BUG FORBIDDEN ON PUT
 	@POST
-	@Consumes("application/json; charset=UTF-8")
+	@Consumes("application/json;charset=UTF-8")
+	@Produces("*/*")
 	public Response post(String resourceJSON) {
 
 		Response response;
 		String error = "No se ha podido crear/modificar el recurso";
 
-		IncidenciaBO incidencia = IncidenciaBO.newFromJSON(resourceJSON);
+		IssueBO issue = (IssueBO) JSON.decode(resourceJSON, IssueBO.class);
 
-		if (incidencia != null) {
-			IncidenciaDAO.save(incidencia);
+		if (issue != null) {
+			issue.update();
 
 			// TODO Componer la uri con la location del recurso creado
 
@@ -125,4 +76,36 @@ public class IncidenciaREST {
 		return response;
 
 	}
+
+	//TODO Solucionar error de unsuported media type al mandar JSON
+	/*
+	@PUT
+	@Consumes("application/json;charset=UTF-8")
+	public Response put(String resourceJSON) {
+
+		Response response;
+		String error = "No se ha podido crear/modificar el recurso";
+
+		IssueBO incidencia = IssueBO.newFromJSON(resourceJSON);
+
+		if (incidencia != null) {
+			IssueDAO.save(incidencia);
+
+			// TODO Componer la uri con la location del recurso creado
+
+			// String baseUri = uri.getBaseUri().toString();
+			// String resourceUri = baseUri + "incidencia/" +
+			// incidencia.getId();
+			// response = Response.created(resourceUri).build();
+			response = Response.status(201).build();
+		} else {
+			response = Response.status(400).entity(error).type("text/plain").build();
+		}
+
+		return response;
+
+	}
+	*/
+	
+
 }

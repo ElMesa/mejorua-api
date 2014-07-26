@@ -8,42 +8,82 @@
 	<name>MejorUA API</name>
 
 	<properties>
+		<java-version>1.7</java-version>
+		
+		<!-- PLUGGIN VERSIONS -->
+		<maven-compiler-version>3.1</maven-compiler-version>
 		<jackson-2-version>2.3.1</jackson-2-version>
 		<jersey-version>1.8</jersey-version>
+		<tomcat7-verion>2.2</tomcat7-verion>
+		
+		<!-- CONFIG -->
+		<project-war-name>mejorua-api</project-war-name>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    	<project-deploy-path>/${project-war-name}</project-deploy-path> <!-- Concrete alternative for tomcat deploy <maven.tomcat.path></maven.tomcat.path> -->
+    	
+    	<!-- TODO add tomcat HTTP Support PROPIERTY maven.tomcat.https.clientAuth READ http://tomcat.apache.org/maven-plugin-2.1/tomcat7-maven-plugin/run-mojo.html#clientAuth -->
 	</properties>
 
 	<build>
-		<finalName>mejorua.api</finalName>
+		<!-- PACKAGE NAME -->
+		<finalName>${project-war-name}</finalName>
+		
 		<plugins>
+		
+			<!-- COMPILER -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<inherited>true</inherited>
+				<version>${maven-compiler-version}</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
 				</configuration>
 			</plugin>
+			
+			<!-- GlassFish embed or manipulate -->
+			<!--
 			<plugin>
 				<groupId>org.glassfish</groupId>
 				<artifactId>maven-glassfish-plugin</artifactId>
 			</plugin>
+			-->
 
+			<!-- Tomcat embed or manipulate -->
+			<!-- TODO Delete if new org.apache.tomcat.maven plugin is working -->
+			<!-- 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<configuration>
 					<url>http://127.0.0.1:8080/manager/text</url>
 					<server>Tomcat7</server>
-					<path>/mejorua.api</path>
+					<path>${project-deploy-path}</path>
 				</configuration>
 			</plugin>
+			-->
+
+			<!-- Tomcat embed or manipulate -->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>${tomcat7-verion}</version>
+				<configuration>
+					<!-- DOCUMENTATION: http://tomcat.apache.org/maven-plugin-2.1/tomcat7-maven-plugin/run-mojo.html -->
+					<url>http://127.0.0.1:8080/manager/text</url>
+					<server>Tomcat7</server>
+					<path>${project-deploy-path}</path>
+					<password>maven</password>
+					<username>maven</username>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 	<dependencies>
 
 		<!-- JERSEY WEBAPP ARCHETYPE DEPENDENCIES -->
-
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
@@ -60,18 +100,21 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- TODO ¿DELETE? REALLY NEEDED? -->
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>${jersey-version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- TODO ¿DELETE? REALLY NEEDED? -->
 		<dependency>
 			<groupId>org.glassfish.distributions</groupId>
 			<artifactId>web-all</artifactId>
 			<version>10.0-build-20080430</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- TODO ¿DELETE? REALLY NEEDED? -->
 		<dependency>
 			<groupId>org.glassfish.embedded</groupId>
 			<artifactId>gf-embedded-api</artifactId>

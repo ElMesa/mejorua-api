@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="mejorua-api">
-        <wb-resource deploy-path="/" source-path="/target/mejorua.api" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
-        <property name="java-output-path" value="/mejorua-api/target/classes"/>
+        <wb-resource deploy-path="/" source-path="/target/mejorua-api" tag="defaultRootSource"/>
         <property name="context-root" value="ROOT"/>
+        <property name="java-output-path" value="/mejorua-api/target/classes"/>
     </wb-module>
 </project-modules>
