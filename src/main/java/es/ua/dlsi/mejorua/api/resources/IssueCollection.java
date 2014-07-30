@@ -31,7 +31,7 @@ public class IssueCollection {
 	 *         "application/json".
 	 */
 	@GET
-	public Response get(@PathParam("id") String idString) {
+	public Response get() {
 
 		Response response;
 		String json = "";
@@ -45,6 +45,17 @@ public class IssueCollection {
 		} else {
 			response = Response.status(404).entity(error).type("text/plain").build();
 		}
+
+		return response;
+	}
+	
+	@Path("/issues.geojson")
+	@GET
+	public Response getGeoJSON() {
+
+		Response response;
+
+			response = Response.ok("GEOJSON").build();
 
 		return response;
 	}

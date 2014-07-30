@@ -1,17 +1,24 @@
 package es.ua.dlsi.mejorua.api.business;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
+import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
 import es.ua.dlsi.mejorua.api.persistance.IssueDAO;
 
 public class IssueBO {
 
 	private long id;
-	private float latitude;
-	private float longitude;
+	private String status;
 	private String action;
 	private String term;
+	
+	private double latitude;
+	private double longitude;
+	private FeatureBO geoJSONFeature;
+	
+	public IssueBO() {
+		this.geoJSONFeature = new FeatureBO();
+	}
 
 	public static HashMap<Long, IssueBO> getAll() {
 		return IssueDAO.getAll();
@@ -108,22 +115,26 @@ public class IssueBO {
 
 	public void setId(long id) {
 		this.id = id;
+		//this.geoJSONFeature.setId(String.valueOf(this.id));
+		this.geoJSONFeature.setProperty("id", String.valueOf(this.id));
 	}
 
-	public float getLatitude() {
+	public double getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(float latitude) {
+	public void setLatitude(double latitude) {
 		this.latitude = latitude;
+		this.geoJSONFeature.setLatitude(latitude);
 	}
 
-	public float getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(float longitude) {
+	public void setLongitude(double longitude) {
 		this.longitude = longitude;
+		this.geoJSONFeature.setLongitude(longitude);
 	}
 
 	public String getAction() {
@@ -132,6 +143,7 @@ public class IssueBO {
 
 	public void setAction(String action) {
 		this.action = action;
+		this.geoJSONFeature.setProperty("action", this.action);
 	}
 
 	public String getTerm() {
@@ -140,6 +152,19 @@ public class IssueBO {
 
 	public void setTerm(String term) {
 		this.term = term;
+		this.geoJSONFeature.setProperty("term", this.term);
 	}
 
+	public FeatureBO getGeoJSONFeature() {
+		return geoJSONFeature;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+		this.geoJSONFeature.setProperty("status", this.status);
+	}
 }
