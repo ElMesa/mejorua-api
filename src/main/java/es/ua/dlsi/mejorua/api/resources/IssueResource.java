@@ -1,5 +1,7 @@
 package es.ua.dlsi.mejorua.api.resources;
 
+import java.util.HashMap;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -11,6 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import es.ua.dlsi.mejorua.api.business.IssueBO;
+import es.ua.dlsi.mejorua.api.business.IssueBO.State;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
 /**
@@ -36,31 +39,50 @@ public class IssueResource {
 		Response response;
 		String json = "";
 		String error = "Failed to retrieve resource";
-		
+
 		IssueBO issue = IssueBO.get(Long.valueOf(idString));
 
 		if (issue != null) {
 			json = JSON.encode(issue);
 			response = Response.ok(json).build();
 		} else {
-			response = Response.status(404).entity(error).type("text/plain").build();
+			response = Response.status(404).entity(error).type("text/plain")
+					.build();
 		}
 
 		return response;
 	}
-	
+
 	@POST
 	@Consumes("application/json;charset=UTF-8")
 	@Produces("*/*")
-	public Response post(String resourceJSON) {
+	public Response post(String resourceJSON, @PathParam("id") String idString) {
 
 		Response response;
 		String error = "No se ha podido crear/modificar el recurso";
 
-		IssueBO issue = (IssueBO) JSON.decode(resourceJSON, IssueBO.class);
+		// IssueBO postedIssue = (IssueBO) JSON.decode(resourceJSON,
+		// IssueBO.class);
+		HashMap<String, Object> dataHash = JSON.decodeToHash(resourceJSON);
 
-		if (issue != null) {
-			issue.update();
+		if (dataHash.size() > 0) {
+
+			boolean isChanged = false;
+
+			IssueBO issue = IssueBO.get(new Long(idString));
+
+			String state = (String) dataHash.get("state");
+			if (state != null) {
+				if (issue.onChangeState(State.valueOf(state))) {
+					isChanged = true;
+				}
+			}
+
+			if (isChanged) {
+				issue.update();
+			}
+
+			String JSONResponse = JSON.encode(issue);
 
 			// TODO Componer la uri con la location del recurso creado
 
@@ -68,44 +90,41 @@ public class IssueResource {
 			// String resourceUri = baseUri + "incidencia/" +
 			// incidencia.getId();
 			// response = Response.created(resourceUri).build();
-			response = Response.status(201).build();
+			response = Response.status(201).entity(JSONResponse).build();
 		} else {
-			response = Response.status(400).entity(error).type("text/plain").build();
+			response = Response.status(400).entity(error).type("text/plain")
+					.build();
 		}
 
 		return response;
 
 	}
 
-	//TODO Solucionar error de unsuported media type al mandar JSON
+	// TODO Solucionar error de unsuported media type al mandar JSON
 	/*
-	@PUT
-	@Consumes("application/json;charset=UTF-8")
-	public Response put(String resourceJSON) {
-
-		Response response;
-		String error = "No se ha podido crear/modificar el recurso";
-
-		IssueBO incidencia = IssueBO.newFromJSON(resourceJSON);
-
-		if (incidencia != null) {
-			IssueDAO.save(incidencia);
-
-			// TODO Componer la uri con la location del recurso creado
-
-			// String baseUri = uri.getBaseUri().toString();
-			// String resourceUri = baseUri + "incidencia/" +
-			// incidencia.getId();
-			// response = Response.created(resourceUri).build();
-			response = Response.status(201).build();
-		} else {
-			response = Response.status(400).entity(error).type("text/plain").build();
-		}
-
-		return response;
-
-	}
-	*/
-	
+	 * @PUT
+	 * 
+	 * @Consumes("application/json;charset=UTF-8") public Response put(String
+	 * resourceJSON) {
+	 * 
+	 * Response response; String error =
+	 * "No se ha podido crear/modificar el recurso";
+	 * 
+	 * IssueBO incidencia = IssueBO.newFromJSON(resourceJSON);
+	 * 
+	 * if (incidencia != null) { IssueDAO.save(incidencia);
+	 * 
+	 * // TODO Componer la uri con la location del recurso creado
+	 * 
+	 * // String baseUri = uri.getBaseUri().toString(); // String resourceUri =
+	 * baseUri + "incidencia/" + // incidencia.getId(); // response =
+	 * Response.created(resourceUri).build(); response =
+	 * Response.status(201).build(); } else { response =
+	 * Response.status(400).entity(error).type("text/plain").build(); }
+	 * 
+	 * return response;
+	 * 
+	 * }
+	 */
 
 }

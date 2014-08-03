@@ -2,40 +2,79 @@ package es.ua.dlsi.mejorua.api.business;
 
 import java.util.HashMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
 import es.ua.dlsi.mejorua.api.persistance.IssueDAO;
 
 public class IssueBO {
 
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// OWN DATA
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
+	public enum State {
+		pending, inProgress, done
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// DEPENDENCIES
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
+	private IssueEventCollection events;
+	private FeatureBO geoJSONFeature;
+
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// ATRIBUTTES
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
 	private long id;
-	private String status;
+
+	private State state;
+
 	private String action;
 	private String term;
-	
+
 	private double latitude;
 	private double longitude;
-	private FeatureBO geoJSONFeature;
-	
+
+	// SIGUACODE de asocia issue con localizacion "logico"
+
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// METHODS
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
 	public IssueBO() {
-		this.geoJSONFeature = new FeatureBO();
+
+		geoJSONFeature = new FeatureBO();
+
+		onCreate();
 	}
 
 	public static HashMap<Long, IssueBO> getAll() {
 		return IssueDAO.getAll();
 	}
-	
+
 	public static IssueBO get(long id) {
 		return IssueDAO.get(id);
 	}
 
 	public static long add(IssueBO issue) {
-		
+
 		long newId = -1;
-		
+
 		if (issue.isValid()) {
 			newId = IssueDAO.add(issue);
 		}
-		
+
 		return newId;
 	}
 
@@ -51,15 +90,40 @@ public class IssueBO {
 		return isSaved;
 	}
 
-	// ///////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////
 	//
-	// Validators
+	// EVENTS
 	//
-	// ///////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////
+
+	public void onCreate() {
+
+		this.events = new IssueEventCollection();
+		this.events.create();
+	}
+
+	public boolean onChangeState(State state) {
+		
+		boolean isChanged = false;
+		
+		if(setState(state)) {
+			events.changeState(state);
+			isChanged = true;
+		}
+		
+		return isChanged;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// VALIDATORS
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
 
 	// TODO Implement this mockup validation and subvalidation using
 	// util.Validator and giving meaningfull error responses for each fail
 	// (wachtout security issues with the info given)
+	@JsonIgnore
 	public boolean isValid() {
 
 		boolean isValid = true;
@@ -74,6 +138,7 @@ public class IssueBO {
 		return isValid;
 	}
 
+	@JsonIgnore
 	public boolean isValidId() {
 		boolean isValid = false;
 
@@ -83,31 +148,35 @@ public class IssueBO {
 		return isValid;
 	}
 
+	@JsonIgnore
 	public boolean isValidLatitude() {
 		boolean isValid = true;
 		return isValid;
 	}
 
+	@JsonIgnore
 	public boolean isValidLongitude() {
 		boolean isValid = true;
 		return isValid;
 	}
 
+	@JsonIgnore
 	public boolean isValidAction() {
 		boolean isValid = true;
 		return isValid;
 	}
 
+	@JsonIgnore
 	public boolean isValidTerm() {
 		boolean isValid = true;
 		return isValid;
 	}
 
-	// ///////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////
 	//
 	// GETTERS AND SETTERS
 	//
-	// ///////////////////////
+	// /////////////////////////////////////////////////////////////////////////////////
 
 	public long getId() {
 		return id;
@@ -115,7 +184,7 @@ public class IssueBO {
 
 	public void setId(long id) {
 		this.id = id;
-		//this.geoJSONFeature.setId(String.valueOf(this.id));
+		// this.geoJSONFeature.setId(String.valueOf(this.id));
 		this.geoJSONFeature.setProperty("id", String.valueOf(this.id));
 	}
 
@@ -159,12 +228,30 @@ public class IssueBO {
 		return geoJSONFeature;
 	}
 
-	public String getStatus() {
-		return status;
+	public State getState() {
+		return state;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
-		this.geoJSONFeature.setProperty("status", this.status);
+	public boolean setState(State state) {
+
+		boolean isSetted = false;
+		
+		if (this.state != state) {
+			this.state = state;
+			this.geoJSONFeature.setProperty("state", this.state.name());
+			
+			isSetted = true;
+		}
+		
+		return isSetted;
 	}
+
+	public IssueEventCollection getEvents() {
+		return events;
+	}
+
+	public void setEvents(IssueEventCollection events) {
+		this.events = events;
+	}
+
 }

@@ -1,10 +1,14 @@
 package es.ua.dlsi.mejorua.api.util;
 
 import java.io.IOException;
+import java.util.HashMap;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JSON {
 
@@ -41,6 +45,32 @@ public class JSON {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		return o;
+	}
+
+	public static HashMap<String, Object> decodeToHash(String JSON) {
+
+		HashMap<String, Object> o = new HashMap<String, Object>();
+
+		JsonFactory factory = new JsonFactory();
+		ObjectMapper mapper = new ObjectMapper(factory);
+		TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+		};
+
+		try {
+			o = mapper.readValue(JSON, typeRef);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("JSON.decodeToHash = " + o);
 
 		return o;
 	}

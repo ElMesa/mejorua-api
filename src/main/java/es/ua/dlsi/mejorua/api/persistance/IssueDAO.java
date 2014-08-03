@@ -1,9 +1,9 @@
 package es.ua.dlsi.mejorua.api.persistance;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import es.ua.dlsi.mejorua.api.business.IssueBO;
+import es.ua.dlsi.mejorua.api.business.IssueBO.State;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
 public class IssueDAO {
@@ -63,7 +63,7 @@ public class IssueDAO {
 	private static IssueBO DEBUGnewIssue(int id, String status, float[] coordinates) {
 		IssueBO debugIssue = new IssueBO();
 		debugIssue.setId(id);
-		debugIssue.setStatus(status);
+		debugIssue.setState(State.pending);
 		debugIssue.setTerm(id + " PrePopulated Term");
 		debugIssue.setAction(id + " PrePopulated Action");
 		

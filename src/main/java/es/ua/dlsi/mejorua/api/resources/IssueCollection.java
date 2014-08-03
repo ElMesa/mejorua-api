@@ -49,6 +49,7 @@ public class IssueCollection {
 		return response;
 	}
 	
+	//TODO Use header/getParam with contentType application/vnd.geo+json to ask for geoJSON
 	@Path("/issues.geojson")
 	@GET
 	public Response getGeoJSON() {
