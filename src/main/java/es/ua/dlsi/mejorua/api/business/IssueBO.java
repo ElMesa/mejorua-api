@@ -1,8 +1,10 @@
 package es.ua.dlsi.mejorua.api.business;
 
 import java.util.HashMap;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
 import es.ua.dlsi.mejorua.api.persistance.IssueDAO;
@@ -26,7 +28,7 @@ public class IssueBO {
 	// /////////////////////////////////////////////////////////////////////////////////
 
 	private IssueEventCollection events;
-	private FeatureBO geoJSONFeature;
+	private FeatureBO geoJSONFeature; //Derived atribute - IssueBO JSON Notation
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -43,6 +45,9 @@ public class IssueBO {
 
 	private double latitude;
 	private double longitude;
+	
+	private long creationDate; //Derived attribute - From first create event date in events
+	private long lastModifiedDate; //Derived attribute - From last event date in events
 
 	// SIGUACODE de asocia issue con localizacion "logico"
 
@@ -98,16 +103,21 @@ public class IssueBO {
 
 	public void onCreate() {
 
+		IssueEventBO event;
+		
 		this.events = new IssueEventCollection();
-		this.events.create();
+		event = this.events.create();
+		this.creationDate = event.getDate();
 	}
 
 	public boolean onChangeState(State state) {
 		
+		IssueEventBO event;
 		boolean isChanged = false;
 		
 		if(setState(state)) {
-			events.changeState(state);
+			event = events.changeState(state);
+			this.lastModifiedDate = event.getDate();
 			isChanged = true;
 		}
 		
@@ -246,12 +256,18 @@ public class IssueBO {
 		return isSetted;
 	}
 
+	@JsonIgnore
 	public IssueEventCollection getEvents() {
 		return events;
 	}
 
 	public void setEvents(IssueEventCollection events) {
 		this.events = events;
+	}
+	
+	@JsonProperty(value="events")
+	public Object[] getEventsList() {
+		return events.getEvents().toArray();
 	}
 
 }

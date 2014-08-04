@@ -53,17 +53,17 @@ public class IssueDAO {
 		float[] bibliotecaGeneralCoords = new float[]{38.383235f,-0.512158f};
 		float[] eps1Coords = new float[]{38.386755f,-0.511295f};
 		
-		add(DEBUGnewIssue(1, "pending", aulario2Coords));
-		add(DEBUGnewIssue(2, "done", bibliotecaGeneralCoords));
-		add(DEBUGnewIssue(3, "inProgress", eps1Coords));
+		add(DEBUGnewIssue(1, State.pending, aulario2Coords));
+		add(DEBUGnewIssue(2, State.done, bibliotecaGeneralCoords));
+		add(DEBUGnewIssue(3, State.inProgress, eps1Coords));
 		
 		System.out.println("IssueDAO.DEBUGprePopulate()\n" + JSON.encode(issues));
 	}
 	
-	private static IssueBO DEBUGnewIssue(int id, String status, float[] coordinates) {
+	private static IssueBO DEBUGnewIssue(int id, State state, float[] coordinates) {
 		IssueBO debugIssue = new IssueBO();
 		debugIssue.setId(id);
-		debugIssue.setState(State.pending);
+		debugIssue.setState(state);
 		debugIssue.setTerm(id + " PrePopulated Term");
 		debugIssue.setAction(id + " PrePopulated Action");
 		

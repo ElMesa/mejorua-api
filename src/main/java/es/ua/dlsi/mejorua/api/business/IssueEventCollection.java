@@ -26,15 +26,17 @@ public class IssueEventCollection {
 		this.events = new ArrayList<IssueEventBO>();
 	}
 
-	public void create() {
+	public IssueEventBO create() {
 
 		IssueEventBO event = new IssueEventBO(events.size() + 1,
 				eventType.create);
 
 		this.events.add(event);
+		
+		return event;
 	}
 
-	public void changeState(State state) {
+	public IssueEventBO changeState(State state) {
 
 		IssueEventBO event = IssueEventBO.newChangeState(events.size() + 1,
 				state);
@@ -42,6 +44,8 @@ public class IssueEventCollection {
 		if (event != null) {
 			this.events.add(event);
 		}
+		
+		return event;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
