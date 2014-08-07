@@ -1,6 +1,5 @@
 package es.ua.dlsi.mejorua.api.business.geojson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

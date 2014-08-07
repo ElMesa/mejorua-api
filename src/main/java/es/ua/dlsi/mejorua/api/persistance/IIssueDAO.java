@@ -2,18 +2,18 @@ package es.ua.dlsi.mejorua.api.persistance;
 
 import java.util.HashMap;
 
-import es.ua.dlsi.mejorua.api.business.IssueBO;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 
 public interface IIssueDAO {
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	//
-	// IssueBO - Collection
+	// IssueTO - Collection
 	//
 	// ////////////////////////////////////////////////////////////////////////////////////
 	
 	// Read
-	public HashMap<Long, IssueBO> getAll();
+	public HashMap<Long, IssueTO> getAll();
 
 	// Create - NOT ALLOWED - No bulk CRUD "modifiers"
 	// Update - NOT ALLOWED - No bulk CRUD "modifiers"
@@ -21,18 +21,18 @@ public interface IIssueDAO {
 
 	// ////////////////////////////////////////////////////////////////////////////////////
 	//
-	// IssueBO - Individual resource
+	// IssueTO - Individual resource
 	//
 	// ////////////////////////////////////////////////////////////////////////////////////
 	
 	// Create
-	public long create(IssueBO issue);
+	public long create(IssueTO issue);
 	
 	// Read
-	public IssueBO get(long id);
+	public IssueTO get(long id);
 	
 	// Update
-	public boolean update(IssueBO issue);
+	public boolean update(IssueTO issue);
 	
 	// Delete - NOT ALLOWED - Nowadays issues only change state, there is no delete functionality
 }

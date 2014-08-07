@@ -7,13 +7,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import es.ua.dlsi.mejorua.api.business.IssueBO;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
 @Path("/issues")
@@ -37,10 +37,10 @@ public class IssueCollection {
 		String json = "";
 		String error = "Failed to retrieve resource";
 		
-		HashMap<Long, IssueBO> issues = IssueBO.getAll();
+		HashMap<Long, IssueTO> issues = IssueBO.getAll();
 
 		if (issues != null) {
-			json = JSON.encode(new ArrayList<IssueBO>(issues.values()));
+			json = JSON.encode(new ArrayList<IssueTO>(issues.values()));
 			response = Response.ok(json).build();
 		} else {
 			response = Response.status(404).entity(error).type("text/plain").build();
@@ -68,7 +68,7 @@ public class IssueCollection {
 		Response response;
 		String error = "No se ha podido crear/modificar el recurso";
 
-		IssueBO issue = (IssueBO) JSON.decode(resourceJSON, IssueBO.class);
+		IssueTO issue = (IssueTO) JSON.decode(resourceJSON, IssueTO.class);
 
 		if (issue != null) {
 			IssueBO.add(issue);

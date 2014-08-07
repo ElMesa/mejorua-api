@@ -3,28 +3,29 @@ package es.ua.dlsi.mejorua.api.persistance;
 import java.util.HashMap;
 
 import es.ua.dlsi.mejorua.api.business.IssueBO;
-import es.ua.dlsi.mejorua.api.business.IssueBO.State;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
 public class IssueDAO implements IIssueDAO {
 
 	private static long nextId = 1;
-	private static HashMap<Long, IssueBO> issues = new HashMap<Long, IssueBO>();
+	private static HashMap<Long, IssueTO> issues = new HashMap<Long, IssueTO>();
 
 	public IssueDAO() {
 		DEBUGprePopulate();
 	}
 
-	public HashMap<Long, IssueBO> getAll() {
+	public HashMap<Long, IssueTO> getAll() {
 		return issues;
 	}
 
-	public IssueBO get(long id) {
+	public IssueTO get(long id) {
 
 		return issues.get(id);
 	}
 
-	public long create(IssueBO issue) {
+	public long create(IssueTO issue) {
 
 		long newId = nextId;
 
@@ -37,7 +38,7 @@ public class IssueDAO implements IIssueDAO {
 		return newId;
 	}
 
-	public boolean update(IssueBO issue) {
+	public boolean update(IssueTO issue) {
 
 		boolean isUpdated = false;
 
@@ -63,19 +64,21 @@ public class IssueDAO implements IIssueDAO {
 				+ JSON.encode(issues));
 	}
 
-	private IssueBO DEBUGnewIssue(int id, State state, float[] coordinates) {
-		IssueBO debugIssue = new IssueBO();
-		debugIssue.setId(id);
-		debugIssue.setState(state);
-		debugIssue.setTerm(id + " PrePopulated Term");
-		debugIssue.setAction(id + " PrePopulated Action");
+	private IssueTO DEBUGnewIssue(int id, State state, float[] coordinates) {
+		IssueBO issueBO = new IssueBO();
+		IssueTO issueTO = issueBO.getTO();
+		
+		issueTO.setId(id);
+		issueTO.setState(state);
+		issueTO.setTerm(id + " PrePopulated Term");
+		issueTO.setAction(id + " PrePopulated Action");
 
-		debugIssue.setLatitude(coordinates[0]);
-		debugIssue.setLongitude(coordinates[1]);
+		issueTO.setLatitude(coordinates[0]);
+		issueTO.setLongitude(coordinates[1]);
 
 		System.out.println("\n\n\nIssueDAO.DEBUGnewIssue()\n"
-				+ JSON.encode(debugIssue));
+				+ JSON.encode(issueTO));
 
-		return debugIssue;
+		return issueTO;
 	}
 }

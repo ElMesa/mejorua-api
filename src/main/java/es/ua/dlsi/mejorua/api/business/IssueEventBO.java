@@ -1,6 +1,6 @@
 package es.ua.dlsi.mejorua.api.business;
 
-import es.ua.dlsi.mejorua.api.business.IssueBO.State;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
 public class IssueEventBO {
 

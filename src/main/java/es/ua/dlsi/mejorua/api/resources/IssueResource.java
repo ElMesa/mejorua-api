@@ -13,7 +13,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import es.ua.dlsi.mejorua.api.business.IssueBO;
-import es.ua.dlsi.mejorua.api.business.IssueBO.State;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
 /**
@@ -40,7 +41,7 @@ public class IssueResource {
 		String json = "";
 		String error = "Failed to retrieve resource";
 
-		IssueBO issue = IssueBO.get(Long.valueOf(idString));
+		IssueTO issue = IssueBO.get(Long.valueOf(idString));
 
 		if (issue != null) {
 			json = JSON.encode(issue);
@@ -69,20 +70,21 @@ public class IssueResource {
 
 			boolean isChanged = false;
 
-			IssueBO issue = IssueBO.get(new Long(idString));
+			IssueTO issueTO = IssueBO.get(new Long(idString));
+			IssueBO issueBO = new IssueBO(issueTO);
 
 			String state = (String) dataHash.get("state");
 			if (state != null) {
-				if (issue.onChangeState(State.valueOf(state))) {
+				if (issueBO.onChangeState(State.valueOf(state))) {
 					isChanged = true;
 				}
 			}
 
 			if (isChanged) {
-				issue.update();
+				issueBO.update();
 			}
 
-			String JSONResponse = JSON.encode(issue);
+			String JSONResponse = JSON.encode(issueBO.getTO());
 
 			// TODO Componer la uri con la location del recurso creado
 

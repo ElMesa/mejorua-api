@@ -2,28 +2,12 @@ package es.ua.dlsi.mejorua.api.business;
 
 import java.util.HashMap;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
 import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
 import es.ua.dlsi.mejorua.api.persistance.IssueDAO;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO;
+import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
-@Entity
 public class IssueBO {
-
-	// /////////////////////////////////////////////////////////////////////////////////
-	//
-	// OWN DATA
-	//
-	// /////////////////////////////////////////////////////////////////////////////////
-
-	public enum State {
-		pending, inProgress, done
-	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -32,33 +16,8 @@ public class IssueBO {
 	// /////////////////////////////////////////////////////////////////////////////////
 
 	private static IIssueDAO dao;
-	private IssueEventCollection events;
-	private FeatureBO geoJSONFeature; // Derived atribute - IssueBO JSON
-										// Notation
-
-	// /////////////////////////////////////////////////////////////////////////////////
-	//
-	// ATRIBUTTES
-	//
-	// /////////////////////////////////////////////////////////////////////////////////
-
-	@Id
-	private long id;
-
-	private State state;
-
-	private String action;
-	private String term;
-
-	private double latitude;
-	private double longitude;
-
-	private long creationDate; // Derived attribute - From first create event
-								// date in events
-	private long lastModifiedDate; // Derived attribute - From last event date
-									// in events
-
-	// SIGUACODE de asocia issue con localizacion "logico"
+	//TODO - REFACTOR - GAIN:Scalability - Extract TO from BO and make all methods static to eliminate 1to1 dependecy between them. BO doens needs to have his own internal state (the TO), just needs know how to work with TO's
+	private IssueTO to;
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -74,9 +33,13 @@ public class IssueBO {
 	// Constructor
 	public IssueBO() {
 
-		geoJSONFeature = new FeatureBO();
+		to = new IssueTO();
 
 		onCreate();
+	}
+	
+	public IssueBO(IssueTO to) {
+		this.to = to;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -85,20 +48,22 @@ public class IssueBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
-	public static HashMap<Long, IssueBO> getAll() {
+	public static HashMap<Long, IssueTO> getAll() {
 		return dao.getAll();
 	}
 
-	public static IssueBO get(long id) {
+	public static IssueTO get(long id) {
 		return dao.get(id);
 	}
 
-	public static long add(IssueBO issue) {
+	public static long add(IssueTO issueTO) {
 
 		long newId = -1;
+		
+		IssueBO issueBO = new IssueBO(issueTO);
 
-		if (issue.isValid()) {
-			newId = dao.create(issue);
+		if (issueBO.isValid()) {
+			newId = dao.create(issueTO);
 		}
 
 		return newId;
@@ -108,8 +73,8 @@ public class IssueBO {
 
 		boolean isSaved = false;
 
-		if (isValid() && get(id) != null) {
-			dao.update(this);
+		if (isValid() && get(to.getId()) != null) {
+			dao.update(to);
 			isSaved = true;
 		}
 
@@ -126,9 +91,9 @@ public class IssueBO {
 
 		IssueEventBO event;
 
-		this.events = new IssueEventCollection();
-		event = this.events.create();
-		this.creationDate = event.getDate();
+		to.setEvents(new IssueEventCollection());
+		event = to.getEvents().create();
+		to.setCreationDate(event.getDate());
 	}
 
 	public boolean onChangeState(State state) {
@@ -137,8 +102,8 @@ public class IssueBO {
 		boolean isChanged = false;
 
 		if (setState(state)) {
-			event = events.changeState(state);
-			this.lastModifiedDate = event.getDate();
+			event = to.getEvents().changeState(state);
+			to.setLastModifiedDate(event.getDate());
 			isChanged = true;
 		}
 
@@ -154,7 +119,6 @@ public class IssueBO {
 	// TODO Implement this mockup validation and subvalidation using
 	// util.Validator and giving meaningfull error responses for each fail
 	// (wachtout security issues with the info given)
-	@JsonIgnore
 	public boolean isValid() {
 
 		boolean isValid = true;
@@ -169,35 +133,30 @@ public class IssueBO {
 		return isValid;
 	}
 
-	@JsonIgnore
 	public boolean isValidId() {
 		boolean isValid = false;
 
-		if (id > 0)
+		if (to.getId() > 0)
 			isValid = true;
 
 		return isValid;
 	}
 
-	@JsonIgnore
 	public boolean isValidLatitude() {
 		boolean isValid = true;
 		return isValid;
 	}
 
-	@JsonIgnore
 	public boolean isValidLongitude() {
 		boolean isValid = true;
 		return isValid;
 	}
 
-	@JsonIgnore
 	public boolean isValidAction() {
 		boolean isValid = true;
 		return isValid;
 	}
 
-	@JsonIgnore
 	public boolean isValidTerm() {
 		boolean isValid = true;
 		return isValid;
@@ -209,86 +168,24 @@ public class IssueBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
-	public long getId() {
-		return id;
+	public IssueTO getTO() {
+		return to;
 	}
 
-	public void setId(long id) {
-		this.id = id;
-		// this.geoJSONFeature.setId(String.valueOf(this.id));
-		this.geoJSONFeature.setProperty("id", String.valueOf(this.id));
+	public void setTO(IssueTO to) {
+		this.to = to;
 	}
-
-	public double getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-		this.geoJSONFeature.setLatitude(latitude);
-	}
-
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-		this.geoJSONFeature.setLongitude(longitude);
-	}
-
-	public String getAction() {
-		return action;
-	}
-
-	public void setAction(String action) {
-		this.action = action;
-		this.geoJSONFeature.setProperty("action", this.action);
-	}
-
-	public String getTerm() {
-		return term;
-	}
-
-	public void setTerm(String term) {
-		this.term = term;
-		this.geoJSONFeature.setProperty("term", this.term);
-	}
-
-	public FeatureBO getGeoJSONFeature() {
-		return geoJSONFeature;
-	}
-
-	public State getState() {
-		return state;
-	}
-
+	
 	public boolean setState(State state) {
 
 		boolean isSetted = false;
 
-		if (this.state != state) {
-			this.state = state;
-			this.geoJSONFeature.setProperty("state", this.state.name());
-
+		if (to.getState() != state) {
+			to.setState(state);
 			isSetted = true;
 		}
 
 		return isSetted;
-	}
-
-	@JsonIgnore
-	public IssueEventCollection getEvents() {
-		return events;
-	}
-
-	public void setEvents(IssueEventCollection events) {
-		this.events = events;
-	}
-
-	@JsonProperty(value = "events")
-	public Object[] getEventsList() {
-		return events.getEvents().toArray();
 	}
 
 }
