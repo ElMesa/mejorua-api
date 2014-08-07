@@ -1,14 +1,18 @@
 package es.ua.dlsi.mejorua.api.business;
 
 import java.util.HashMap;
-import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
+import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
 import es.ua.dlsi.mejorua.api.persistance.IssueDAO;
 
+@Entity
 public class IssueBO {
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -27,8 +31,10 @@ public class IssueBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
+	private static IIssueDAO dao;
 	private IssueEventCollection events;
-	private FeatureBO geoJSONFeature; //Derived atribute - IssueBO JSON Notation
+	private FeatureBO geoJSONFeature; // Derived atribute - IssueBO JSON
+										// Notation
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -36,6 +42,7 @@ public class IssueBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
+	@Id
 	private long id;
 
 	private State state;
@@ -45,18 +52,26 @@ public class IssueBO {
 
 	private double latitude;
 	private double longitude;
-	
-	private long creationDate; //Derived attribute - From first create event date in events
-	private long lastModifiedDate; //Derived attribute - From last event date in events
+
+	private long creationDate; // Derived attribute - From first create event
+								// date in events
+	private long lastModifiedDate; // Derived attribute - From last event date
+									// in events
 
 	// SIGUACODE de asocia issue con localizacion "logico"
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
-	// METHODS
+	// CONSTRUCTORS
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
+	// Static constructor
+	static {
+		dao = new IssueDAO();
+	}
+
+	// Constructor
 	public IssueBO() {
 
 		geoJSONFeature = new FeatureBO();
@@ -64,12 +79,18 @@ public class IssueBO {
 		onCreate();
 	}
 
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// DAO
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
 	public static HashMap<Long, IssueBO> getAll() {
-		return IssueDAO.getAll();
+		return dao.getAll();
 	}
 
 	public static IssueBO get(long id) {
-		return IssueDAO.get(id);
+		return dao.get(id);
 	}
 
 	public static long add(IssueBO issue) {
@@ -77,7 +98,7 @@ public class IssueBO {
 		long newId = -1;
 
 		if (issue.isValid()) {
-			newId = IssueDAO.add(issue);
+			newId = dao.create(issue);
 		}
 
 		return newId;
@@ -88,7 +109,7 @@ public class IssueBO {
 		boolean isSaved = false;
 
 		if (isValid() && get(id) != null) {
-			IssueDAO.update(this);
+			dao.update(this);
 			isSaved = true;
 		}
 
@@ -104,23 +125,23 @@ public class IssueBO {
 	public void onCreate() {
 
 		IssueEventBO event;
-		
+
 		this.events = new IssueEventCollection();
 		event = this.events.create();
 		this.creationDate = event.getDate();
 	}
 
 	public boolean onChangeState(State state) {
-		
+
 		IssueEventBO event;
 		boolean isChanged = false;
-		
-		if(setState(state)) {
+
+		if (setState(state)) {
 			event = events.changeState(state);
 			this.lastModifiedDate = event.getDate();
 			isChanged = true;
 		}
-		
+
 		return isChanged;
 	}
 
@@ -245,14 +266,14 @@ public class IssueBO {
 	public boolean setState(State state) {
 
 		boolean isSetted = false;
-		
+
 		if (this.state != state) {
 			this.state = state;
 			this.geoJSONFeature.setProperty("state", this.state.name());
-			
+
 			isSetted = true;
 		}
-		
+
 		return isSetted;
 	}
 
@@ -264,8 +285,8 @@ public class IssueBO {
 	public void setEvents(IssueEventCollection events) {
 		this.events = events;
 	}
-	
-	@JsonProperty(value="events")
+
+	@JsonProperty(value = "events")
 	public Object[] getEventsList() {
 		return events.getEvents().toArray();
 	}
