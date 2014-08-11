@@ -3,7 +3,7 @@ package es.ua.dlsi.mejorua.api.business;
 import java.util.List;
 
 import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
-import es.ua.dlsi.mejorua.api.persistance.IssueJPADAO;
+import es.ua.dlsi.mejorua.api.persistance.IssueJDBCMySQLDAO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
@@ -28,7 +28,8 @@ public class IssueBO {
 	// Static constructor
 	static {
 		//dao = new IssueDebugDAO();
-		dao = new IssueJPADAO();
+		//dao = new IssueJPADAO();
+		dao = new IssueJDBCMySQLDAO();
 	}
 
 	// Constructor
@@ -92,9 +93,9 @@ public class IssueBO {
 
 		IssueEventBO event;
 
-		to.setEvents(new IssueEventCollection());
 		event = to.getEvents().create();
 		to.setCreationDate(event.getDate());
+		to.setLastModifiedDate(event.getDate());
 	}
 
 	public boolean onChangeState(State state) {

@@ -1,7 +1,14 @@
 package es.ua.dlsi.mejorua.api.business;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
+@Entity
 public class IssueEventBO {
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -11,7 +18,33 @@ public class IssueEventBO {
 	// /////////////////////////////////////////////////////////////////////////////////
 
 	public enum eventType {
-		create, state_change_pending, state_change_inProgress, state_change_done
+		CREATE(1), STATE_CHANGE_PENDING(2), STATE_CHANGE_INPROGRESS(3), STATE_CHANGE_DONE(4);
+		
+		private int id;
+
+		private eventType(int id) {
+			this.id = id;
+		}
+
+		public static eventType getType(Integer id) {
+
+			if (id == null) {
+				return null;
+			}
+
+			for (eventType type : eventType.values()) {
+				if (id.equals(type.getId())) {
+					return type;
+				}
+			}
+			throw new IllegalArgumentException(
+					"es.ua.dlsi.mejorua.api.business.IssueEventBO.eventType - No matching type for id "
+							+ id);
+		}
+
+		public int getId() {
+			return id;
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -20,8 +53,12 @@ public class IssueEventBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
+	@Id @GeneratedValue
+	@Column(name="ISSUE_EVENT_ID")
 	private long id;
+	@Basic
 	private eventType type;
+	@Basic
 	private long date;
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +67,9 @@ public class IssueEventBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
+	public IssueEventBO() {
+	}
+	
 	public IssueEventBO(long id, eventType type) {
 		this.id = id;
 		date = System.currentTimeMillis();
@@ -45,15 +85,15 @@ public class IssueEventBO {
 
 		switch (state) {
 		case PENDING:
-			type = eventType.state_change_pending;
+			type = eventType.STATE_CHANGE_PENDING;
 			break;
 
 		case INPROGRESS:
-			type = eventType.state_change_inProgress;
+			type = eventType.STATE_CHANGE_INPROGRESS;
 			break;
 
 		case DONE:
-			type = eventType.state_change_done;
+			type = eventType.STATE_CHANGE_DONE;
 			break;
 
 		default:

@@ -1,14 +1,24 @@
 package es.ua.dlsi.mejorua.api.transfer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import es.ua.dlsi.mejorua.api.business.IssueBO;
+import es.ua.dlsi.mejorua.api.business.IssueEventBO;
 import es.ua.dlsi.mejorua.api.business.IssueEventCollection;
 import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
+import es.ua.dlsi.mejorua.api.util.JSON;
 
 @Entity
 public class IssueTO {
@@ -18,43 +28,41 @@ public class IssueTO {
 	// OWN DATA
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
-/*
+	/*
+	 * public enum State { pending, inProgress, done }
+	 */
+	// JPA Friendly enum - Modification safe (As stated here:
+	// http://blog.chris-ritchie.com/2013/09/mapping-enums-with-fixed-id-in-jpa.html)
 	public enum State {
-		pending, inProgress, done
+
+		PENDING(1), INPROGRESS(2), DONE(3);
+
+		private int id;
+
+		private State(int id) {
+			this.id = id;
+		}
+
+		public static State getType(Integer id) {
+
+			if (id == null) {
+				return null;
+			}
+
+			for (State state : State.values()) {
+				if (id.equals(state.getId())) {
+					return state;
+				}
+			}
+			throw new IllegalArgumentException(
+					"es.ua.dlsi.mejorua.api.transfer.IssueTO.State - No matching type for id "
+							+ id);
+		}
+
+		public int getId() {
+			return id;
+		}
 	}
-*/
-	//JPA Friendly enum - Modification safe (As stated here: http://blog.chris-ritchie.com/2013/09/mapping-enums-with-fixed-id-in-jpa.html) 
-	public enum State {
-
-	    PENDING(1),
-	    INPROGRESS(2),
-	    DONE(3);
-	    
-	    private int id;   
-
-	    private State(int id) {
-	        this.id = id;
-	    }
-
-	    public static State getType(Integer id) {
-	      
-	        if (id == null) {
-	            return null;
-	        }
-
-	        for (State state : State.values()) {
-	            if (id.equals(state.getId())) {
-	                return state;
-	            }
-	        }
-	        throw new IllegalArgumentException("es.ua.dlsi.mejorua.api.transfer.IssueTO.State - No matching type for id " + id);
-	    }
-
-	    public int getId() {
-	        return id;
-	    }
-	}
-
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -73,6 +81,7 @@ public class IssueTO {
 	// /////////////////////////////////////////////////////////////////////////////////
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	@Basic
@@ -105,6 +114,7 @@ public class IssueTO {
 
 	// Constructor
 	public IssueTO() {
+		events = new IssueEventCollection();
 		geoJSONFeature = new FeatureBO();
 	}
 
@@ -171,10 +181,11 @@ public class IssueTO {
 		if (state == null) {
 			this.state = null;
 			this.geoJSONFeature.setProperty("state", null);
-        } else {
-        	this.state = state.getId();
-        	this.geoJSONFeature.setProperty("state", State.getType(this.state).name());
-        }
+		} else {
+			this.state = state.getId();
+			this.geoJSONFeature.setProperty("state", State.getType(this.state)
+					.name());
+		}
 	}
 
 	@JsonIgnore
@@ -187,8 +198,14 @@ public class IssueTO {
 	}
 
 	@JsonProperty(value = "events")
-	public Object[] getEventsList() {
-		return events.getEvents().toArray();
+	@OneToMany(orphanRemoval = true)
+	@JoinColumn(name = "ISSUE_EVENT_ID")
+	public List<IssueEventBO> getEventsList() {
+		return events.getEvents();
+	}
+	
+	public void setEventsList(List<IssueEventBO> events) {
+		this.events.setEvents(events);
 	}
 
 	public long getCreationDate() {
@@ -206,6 +223,41 @@ public class IssueTO {
 	public void setLastModifiedDate(long lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
-	
-	
+
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// DEBUG
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
+	public static List<IssueTO> DEBUGnewIssueList() {
+
+		ArrayList<IssueTO> issues = new ArrayList<IssueTO>();
+		
+		float[] aulario2Coords = new float[] { 38.384488f, -0.510120f };
+		float[] bibliotecaGeneralCoords = new float[] { 38.383235f, -0.512158f };
+		float[] eps1Coords = new float[] { 38.386755f, -0.511295f };
+
+		issues.add(DEBUGnewIssue(1, State.PENDING, aulario2Coords));
+		issues.add(DEBUGnewIssue(2, State.DONE, bibliotecaGeneralCoords));
+		issues.add(DEBUGnewIssue(3, State.INPROGRESS, eps1Coords));
+
+		return issues;
+	}
+
+	private static IssueTO DEBUGnewIssue(int id, State state, float[] coordinates) {
+		IssueBO issueBO = new IssueBO();
+		IssueTO issueTO = issueBO.getTO();
+
+		issueTO.setId(id);
+		issueTO.setState(state);
+		issueTO.setTerm(id + " PrePopulated Term");
+		issueTO.setAction(id + " PrePopulated Action");
+
+		issueTO.setLatitude(coordinates[0]);
+		issueTO.setLongitude(coordinates[1]);
+
+		return issueTO;
+	}
+
 }

@@ -29,7 +29,7 @@ public class IssueEventCollection {
 	public IssueEventBO create() {
 
 		IssueEventBO event = new IssueEventBO(events.size() + 1,
-				eventType.create);
+				eventType.CREATE);
 
 		this.events.add(event);
 		

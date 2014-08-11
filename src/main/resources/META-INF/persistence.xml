@@ -12,7 +12,8 @@ http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
 
         <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
         
-		<class>es.ua.dlsi.mejorua.api.business.IssueTO</class>
+		<class>es.ua.dlsi.mejorua.api.transfer.IssueTO</class>
+		<class>es.ua.dlsi.mejorua.api.business.IssueEventBO</class>
 		<exclude-unlisted-classes />
 
 		<properties>

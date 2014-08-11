@@ -53,35 +53,19 @@ public class IssueDebugDAO implements IIssueDAO {
 		return isUpdated;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// DEBUG
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
 	private void DEBUGprePopulate() {
 
-		float[] aulario2Coords = new float[] { 38.384488f, -0.510120f };
-		float[] bibliotecaGeneralCoords = new float[] { 38.383235f, -0.512158f };
-		float[] eps1Coords = new float[] { 38.386755f, -0.511295f };
+		List<IssueTO> issues = IssueTO.DEBUGnewIssueList();
 
-		create(DEBUGnewIssue(1, State.PENDING, aulario2Coords));
-		create(DEBUGnewIssue(2, State.DONE, bibliotecaGeneralCoords));
-		create(DEBUGnewIssue(3, State.INPROGRESS, eps1Coords));
-
-		System.out.println("IssueDAO.DEBUGprePopulate()\n"
-				+ JSON.encode(issues));
+		for (IssueTO issue : issues) {
+			create(issue);
+		}
 	}
 
-	private IssueTO DEBUGnewIssue(int id, State state, float[] coordinates) {
-		IssueBO issueBO = new IssueBO();
-		IssueTO issueTO = issueBO.getTO();
-		
-		issueTO.setId(id);
-		issueTO.setState(state);
-		issueTO.setTerm(id + " PrePopulated Term");
-		issueTO.setAction(id + " PrePopulated Action");
-
-		issueTO.setLatitude(coordinates[0]);
-		issueTO.setLongitude(coordinates[1]);
-
-		System.out.println("\n\n\nIssueDAO.DEBUGnewIssue()\n"
-				+ JSON.encode(issueTO));
-
-		return issueTO;
-	}
 }
