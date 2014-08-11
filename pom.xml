@@ -21,6 +21,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project-deploy-path>/${project-war-name}</project-deploy-path> <!-- Concrete alternative for tomcat deploy <maven.tomcat.path></maven.tomcat.path> -->
+		<mejorua-persistanceUnit>es.ua.dlsi.mejorua.api.persistanceUnit.mysql</mejorua-persistanceUnit>
+		<!-- <mejorua-persistanceUnit>es.ua.dlsi.mejorua.api.persistanceUnit.h2</mejorua-persistanceUnit> -->
 
 		<!-- TODO add tomcat HTTP Support PROPIERTY maven.tomcat.https.clientAuth 
 			READ http://tomcat.apache.org/maven-plugin-2.1/tomcat7-maven-plugin/run-mojo.html#clientAuth -->
@@ -68,6 +70,51 @@
 				</configuration>
 			</plugin>
 
+			<!-- DATA NUCLEUS MAVEN PLUGIN -->
+			<plugin>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-maven-plugin</artifactId>
+				<version>4.0.0-m2</version>
+				<configuration>
+					<api>JPA</api>
+					<persistenceUnitName>${mejorua-persistanceUnit}</persistenceUnitName>
+					<log4jConfiguration>${basedir}/src/main/resources/log4j.properties</log4jConfiguration>
+					<verbose>false</verbose>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>enhance</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- Maven Dependency Plugin -->
+			<!-- 
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-dependency-plugin</artifactId>
+			  <version>2.1</version>
+			  <executions>
+			    <execution>
+			      <id>copy-dependencies</id>
+			      <phase>package</phase>
+			      <goals>
+			        <goal>copy-dependencies</goal>
+			      </goals>
+			      <configuration>
+			        <outputDirectory>${project.build.directory}/${project-war-name}/WEB-INF/classes/lib</outputDirectory>
+			        <overWriteReleases>false</overWriteReleases>
+			        <overWriteSnapshots>false</overWriteSnapshots>
+			        <overWriteIfNewer>true</overWriteIfNewer>
+			      </configuration>
+			    </execution>
+			  </executions>
+			</plugin>
+			 -->
+
 		</plugins>
 	</build>
 	<dependencies>
@@ -90,26 +137,32 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- TODO ¿DELETE? REALLY NEEDED? -->
+		<!-- 
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>${jersey-version}</version>
 			<scope>test</scope>
 		</dependency>
+		 -->
 		<!-- TODO ¿DELETE? REALLY NEEDED? -->
+		<!-- 
 		<dependency>
 			<groupId>org.glassfish.distributions</groupId>
 			<artifactId>web-all</artifactId>
 			<version>10.0-build-20080430</version>
 			<scope>test</scope>
 		</dependency>
+		 -->
 		<!-- TODO ¿DELETE? REALLY NEEDED? -->
+		<!-- 
 		<dependency>
 			<groupId>org.glassfish.embedded</groupId>
 			<artifactId>gf-embedded-api</artifactId>
 			<version>1.0-alpha-4</version>
 			<scope>test</scope>
 		</dependency>
+		 -->
 
 		<!-- JACKSON DEPENDENCIES -->
 		<dependency>
@@ -133,47 +186,88 @@
 			<artifactId>geojson-jackson</artifactId>
 			<version>1.2</version>
 		</dependency>
-		
+
 		<!-- DataNucleus JPA -->
 		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<!-- DataNucleus JPA - Stackoverflow classdefnotfound at tomcat runtime ¿solution? -->
+		<!-- 
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-jpa</artifactId>
+			<version>2.1.0-release</version>
+			<scope>runtime</scope>
+		</dependency>
+		 -->
+		
+		<!-- DataNucleus JPA - Official web JPA Maven tutorial - RDBMS bundle -->
+		<dependency>
             <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-core</artifactId>
-            <version>[4.0.0-m1, 4.9)</version>
+            <artifactId>datanucleus-accessplatform-jpa-rdbms</artifactId>
+            <version>4.0.0-release</version>
+            <type>pom</type>
         </dependency>
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-api-jpa</artifactId>
-            <version>[4.0.0-m1, 4.9)</version>
-        </dependency>
-        <dependency>
+        
+		
+		<!-- DataNucleus JPA - Official web JPA Maven tutorial -->
+		<!-- 
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-core</artifactId>
+			<version>[4.0.0-m1, 4.9)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-api-jpa</artifactId>
+			<version>[4.0.0-m1, 4.9)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-rdbms</artifactId>
+			<version>[4.0.0-m1, 4.9)</version>
+		</dependency>
+		 -->
+		 
+		<!-- DataNucleus JPA - Official sourceforge JPA Maven tutorial -->
+		<!-- 
+		<dependency>
             <groupId>org.datanucleus</groupId>
             <artifactId>javax.persistence</artifactId>
             <version>2.1.0</version>
         </dependency>
-        
-        <!-- DataNucleus JPA - H2 datastore -->
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-core</artifactId>
+            <version>(3.9, )</version>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-api-jpa</artifactId>
+            <version>(3.9, )</version>
+        </dependency>
         <dependency>
             <groupId>org.datanucleus</groupId>
             <artifactId>datanucleus-rdbms</artifactId>
-            <version>[4.0.0-m1, 4.9)</version>
+            <version>(3.9, )</version>
         </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.3.168</version>
-        </dependency>
-        <!-- ENABLE THIS FOR MYSQL -->
-        <!--dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-rdbms</artifactId>
-            <version>[4.0.0-m1, 4.9)</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.17</version>
-        </dependency-->
-        
+         -->
+		
+		<!-- DataNucleus JPA - H2 datastore - Official sourceforge JPA Maven tutorial -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.3.168</version>
+		</dependency>
+		
+		<!-- DataNucleus JPA - MYSQL - Official sourceforge JPA Maven tutorial -->
+		<dependency> <groupId>mysql</groupId> 
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.17</version>
+		</dependency>
+
 	</dependencies>
 
 	<repositories>

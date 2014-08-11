@@ -1,9 +1,9 @@
 package es.ua.dlsi.mejorua.api.business;
 
-import java.util.HashMap;
+import java.util.List;
 
 import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
-import es.ua.dlsi.mejorua.api.persistance.IssueDAO;
+import es.ua.dlsi.mejorua.api.persistance.IssueJPADAO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
@@ -27,7 +27,8 @@ public class IssueBO {
 
 	// Static constructor
 	static {
-		dao = new IssueDAO();
+		//dao = new IssueDebugDAO();
+		dao = new IssueJPADAO();
 	}
 
 	// Constructor
@@ -48,7 +49,7 @@ public class IssueBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
-	public static HashMap<Long, IssueTO> getAll() {
+	public static List<IssueTO> getAll() {
 		return dao.getAll();
 	}
 

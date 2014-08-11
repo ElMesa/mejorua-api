@@ -1,23 +1,26 @@
 package es.ua.dlsi.mejorua.api.persistance;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import es.ua.dlsi.mejorua.api.business.IssueBO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
-public class IssueDAO implements IIssueDAO {
+public class IssueDebugDAO implements IIssueDAO {
 
 	private static long nextId = 1;
 	private static HashMap<Long, IssueTO> issues = new HashMap<Long, IssueTO>();
 
-	public IssueDAO() {
+	public IssueDebugDAO() {
 		DEBUGprePopulate();
 	}
 
-	public HashMap<Long, IssueTO> getAll() {
-		return issues;
+	public List<IssueTO> getAll() {
+		ArrayList<IssueTO> issuesList = new ArrayList<IssueTO>(issues.values());
+		return issuesList;
 	}
 
 	public IssueTO get(long id) {
@@ -56,9 +59,9 @@ public class IssueDAO implements IIssueDAO {
 		float[] bibliotecaGeneralCoords = new float[] { 38.383235f, -0.512158f };
 		float[] eps1Coords = new float[] { 38.386755f, -0.511295f };
 
-		create(DEBUGnewIssue(1, State.pending, aulario2Coords));
-		create(DEBUGnewIssue(2, State.done, bibliotecaGeneralCoords));
-		create(DEBUGnewIssue(3, State.inProgress, eps1Coords));
+		create(DEBUGnewIssue(1, State.PENDING, aulario2Coords));
+		create(DEBUGnewIssue(2, State.DONE, bibliotecaGeneralCoords));
+		create(DEBUGnewIssue(3, State.INPROGRESS, eps1Coords));
 
 		System.out.println("IssueDAO.DEBUGprePopulate()\n"
 				+ JSON.encode(issues));

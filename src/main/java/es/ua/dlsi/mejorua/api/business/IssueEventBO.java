@@ -44,15 +44,15 @@ public class IssueEventBO {
 		eventType type = null;
 
 		switch (state) {
-		case pending:
+		case PENDING:
 			type = eventType.state_change_pending;
 			break;
 
-		case inProgress:
+		case INPROGRESS:
 			type = eventType.state_change_inProgress;
 			break;
 
-		case done:
+		case DONE:
 			type = eventType.state_change_done;
 			break;
 

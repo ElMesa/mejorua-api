@@ -1,5 +1,6 @@
 package es.ua.dlsi.mejorua.api.transfer;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -17,10 +18,43 @@ public class IssueTO {
 	// OWN DATA
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
-
+/*
 	public enum State {
 		pending, inProgress, done
 	}
+*/
+	//JPA Friendly enum - Modification safe (As stated here: http://blog.chris-ritchie.com/2013/09/mapping-enums-with-fixed-id-in-jpa.html) 
+	public enum State {
+
+	    PENDING(1),
+	    INPROGRESS(2),
+	    DONE(3);
+	    
+	    private int id;   
+
+	    private State(int id) {
+	        this.id = id;
+	    }
+
+	    public static State getType(Integer id) {
+	      
+	        if (id == null) {
+	            return null;
+	        }
+
+	        for (State state : State.values()) {
+	            if (id.equals(state.getId())) {
+	                return state;
+	            }
+	        }
+	        throw new IllegalArgumentException("es.ua.dlsi.mejorua.api.transfer.IssueTO.State - No matching type for id " + id);
+	    }
+
+	    public int getId() {
+	        return id;
+	    }
+	}
+
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -41,16 +75,23 @@ public class IssueTO {
 	@Id
 	private long id;
 
-	private State state;
+	@Basic
+	private Integer state;
 
+	@Basic
 	private String action;
+	@Basic
 	private String term;
 
+	@Basic
 	private double latitude;
+	@Basic
 	private double longitude;
 
+	@Basic
 	private long creationDate; // Derived attribute - From first create event
 								// date in events
+	@Basic
 	private long lastModifiedDate; // Derived attribute - From last event date
 									// in events
 
@@ -123,12 +164,17 @@ public class IssueTO {
 	}
 
 	public State getState() {
-		return state;
+		return State.getType(this.state);
 	}
 
 	public void setState(State state) {
-		this.state = state;
-		this.geoJSONFeature.setProperty("state", this.state.name());
+		if (state == null) {
+			this.state = null;
+			this.geoJSONFeature.setProperty("state", null);
+        } else {
+        	this.state = state.getId();
+        	this.geoJSONFeature.setProperty("state", State.getType(this.state).name());
+        }
 	}
 
 	@JsonIgnore

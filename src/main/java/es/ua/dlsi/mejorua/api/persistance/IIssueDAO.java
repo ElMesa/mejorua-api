@@ -1,6 +1,7 @@
 package es.ua.dlsi.mejorua.api.persistance;
 
 import java.util.HashMap;
+import java.util.List;
 
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 
@@ -13,7 +14,7 @@ public interface IIssueDAO {
 	// ////////////////////////////////////////////////////////////////////////////////////
 	
 	// Read
-	public HashMap<Long, IssueTO> getAll();
+	public List<IssueTO> getAll();
 
 	// Create - NOT ALLOWED - No bulk CRUD "modifiers"
 	// Update - NOT ALLOWED - No bulk CRUD "modifiers"

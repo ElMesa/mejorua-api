@@ -1,7 +1,7 @@
 package es.ua.dlsi.mejorua.api.resources;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -37,10 +37,10 @@ public class IssueCollection {
 		String json = "";
 		String error = "Failed to retrieve resource";
 		
-		HashMap<Long, IssueTO> issues = IssueBO.getAll();
+		List<IssueTO> issues = IssueBO.getAll();
 
 		if (issues != null) {
-			json = JSON.encode(new ArrayList<IssueTO>(issues.values()));
+			json = JSON.encode(issues);
 			response = Response.ok(json).build();
 		} else {
 			response = Response.status(404).entity(error).type("text/plain").build();
