@@ -21,11 +21,11 @@ public class JSON {
 		try {
 			json = mapper.writeValueAsString(o);
 		} catch (JsonGenerationException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.toString(), e);
 		} catch (JsonMappingException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.toString(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.toString(), e);
 		}
 
 		return json;
@@ -39,11 +39,11 @@ public class JSON {
 		try {
 			o = mapper.readValue(JSON, c);
 		} catch (JsonGenerationException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.toString(), e);
 		} catch (JsonMappingException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.toString(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.toString(), e);
 		}
 
 		return o;

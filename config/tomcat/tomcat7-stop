@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /home/mint-mesa/Dev/Software/Libs/apache-tomcat-7.0.54/bin
+./shutdown.sh

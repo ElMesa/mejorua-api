@@ -1,5 +1,8 @@
 package es.ua.dlsi.mejorua.api.business;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,8 +21,9 @@ public class IssueEventBO {
 	// /////////////////////////////////////////////////////////////////////////////////
 
 	public enum eventType {
-		CREATE(1), STATE_CHANGE_PENDING(2), STATE_CHANGE_INPROGRESS(3), STATE_CHANGE_DONE(4);
-		
+		CREATE(1), STATE_CHANGE_PENDING(2), STATE_CHANGE_INPROGRESS(3), STATE_CHANGE_DONE(
+				4);
+
 		private int id;
 
 		private eventType(int id) {
@@ -49,17 +53,55 @@ public class IssueEventBO {
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
+	// DEPENDENCIES
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
+	// {IssueTO} id
+	long issueId;
+
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
 	// ATRIBUTTES
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
-	@Id @GeneratedValue
-	@Column(name="ISSUE_EVENT_ID")
+	@Id
+	@GeneratedValue
+	@Column(name = "ISSUE_EVENT_ID")
 	private long id;
 	@Basic
 	private eventType type;
 	@Basic
 	private long date;
+
+	// /////////////////////////////////////////////////////////////////////////////////
+	//
+	// STATIC METHODS
+	//
+	// /////////////////////////////////////////////////////////////////////////////////
+
+	public static long lastEventDate(List<IssueEventBO> events) {
+		long lastDate = -1;
+
+		if (events != null && events.size() > 0) {
+			lastDate = events.get(events.size() - 1).getDate();
+		}
+
+		return lastDate;
+	}
+
+	public static List<IssueEventBO> eventsAfterDate(long date,
+			List<IssueEventBO> events) {
+		ArrayList<IssueEventBO> filteredEvents = new ArrayList<IssueEventBO>();
+
+		for (IssueEventBO event : events) {
+			if (event.getDate() > date)
+				filteredEvents.add(event);
+		}
+
+		return filteredEvents;
+	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -69,15 +111,15 @@ public class IssueEventBO {
 
 	public IssueEventBO() {
 	}
-	
-	public IssueEventBO(long id, eventType type) {
-		this.id = id;
+
+	public IssueEventBO(long issueId, eventType type) {
+		this.issueId = issueId;
 		date = System.currentTimeMillis();
 
 		this.type = type;
 	}
 
-	public static IssueEventBO newChangeState(long id, State state) {
+	public static IssueEventBO newChangeState(long issueId, State state) {
 
 		IssueEventBO issue = null;
 		boolean isKnownState = true;
@@ -102,7 +144,7 @@ public class IssueEventBO {
 		}
 
 		if (isKnownState) {
-			issue = new IssueEventBO(id, type);
+			issue = new IssueEventBO(issueId, type);
 		}
 
 		return issue;
@@ -137,4 +179,13 @@ public class IssueEventBO {
 	public void setDate(long date) {
 		this.date = date;
 	}
+
+	public long getIssueId() {
+		return issueId;
+	}
+
+	public void setIssueId(long issueId) {
+		this.issueId = issueId;
+	}
+
 }

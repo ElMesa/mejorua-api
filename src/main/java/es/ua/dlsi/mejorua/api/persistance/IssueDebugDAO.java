@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import es.ua.dlsi.mejorua.api.business.IssueBO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
-import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
-import es.ua.dlsi.mejorua.api.util.JSON;
 
 public class IssueDebugDAO implements IIssueDAO {
 

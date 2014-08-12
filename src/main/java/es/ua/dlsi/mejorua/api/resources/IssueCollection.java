@@ -1,6 +1,5 @@
 package es.ua.dlsi.mejorua.api.resources;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -66,12 +65,16 @@ public class IssueCollection {
 	public Response post(String resourceJSON) {
 
 		Response response;
-		String error = "No se ha podido crear/modificar el recurso";
+		String error = "";
+		long issueId;
 
-		IssueTO issue = (IssueTO) JSON.decode(resourceJSON, IssueTO.class);
+		IssueTO issueTO = (IssueTO) JSON.decode(resourceJSON, IssueTO.class);
+		IssueBO issueBO = IssueBO.newFromPartialIssueTO(issueTO);
 
-		if (issue != null) {
-			IssueBO.add(issue);
+		if (issueBO != null) {
+			issueId = IssueBO.add(issueBO.getTO());
+			
+			if(issueId >= 0) {
 
 			// TODO Componer la uri con la location del recurso creado
 
@@ -80,7 +83,12 @@ public class IssueCollection {
 			// incidencia.getId();
 			// response = Response.created(resourceUri).build();
 			response = Response.status(201).build();
+			} else {
+				error = "Server could not persist the issue";
+				response = Response.status(500).entity(error).type("text/plain").build();
+			}
 		} else {
+			error = "Server could not decode the JSON issue";
 			response = Response.status(400).entity(error).type("text/plain").build();
 		}
 

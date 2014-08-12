@@ -1,6 +1,5 @@
 package es.ua.dlsi.mejorua.api.persistance;
 
-import java.util.HashMap;
 import java.util.List;
 
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;

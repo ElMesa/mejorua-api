@@ -11,14 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import es.ua.dlsi.mejorua.api.business.IssueBO;
 import es.ua.dlsi.mejorua.api.business.IssueEventBO;
-import es.ua.dlsi.mejorua.api.business.IssueEventCollection;
 import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
-import es.ua.dlsi.mejorua.api.util.JSON;
 
 @Entity
 public class IssueTO {
@@ -70,7 +67,7 @@ public class IssueTO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
-	private IssueEventCollection events;
+	private List<IssueEventBO> events;
 	private FeatureBO geoJSONFeature; // Derived atribute - IssueBO in geoJSON
 										// Notation
 
@@ -114,7 +111,7 @@ public class IssueTO {
 
 	// Constructor
 	public IssueTO() {
-		events = new IssueEventCollection();
+		events = new ArrayList<IssueEventBO>();
 		geoJSONFeature = new FeatureBO();
 	}
 
@@ -188,24 +185,16 @@ public class IssueTO {
 		}
 	}
 
-	@JsonIgnore
-	public IssueEventCollection getEvents() {
-		return events;
-	}
-
-	public void setEvents(IssueEventCollection events) {
-		this.events = events;
-	}
-
+	
 	@JsonProperty(value = "events")
 	@OneToMany(orphanRemoval = true)
 	@JoinColumn(name = "ISSUE_EVENT_ID")
-	public List<IssueEventBO> getEventsList() {
-		return events.getEvents();
+	public List<IssueEventBO> getEvents() {
+		return events;
 	}
 	
-	public void setEventsList(List<IssueEventBO> events) {
-		this.events.setEvents(events);
+	public void setEvents(List<IssueEventBO> events) {
+		this.events = events;
 	}
 
 	public long getCreationDate() {

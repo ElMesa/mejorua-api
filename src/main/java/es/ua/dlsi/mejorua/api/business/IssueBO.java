@@ -1,13 +1,17 @@
 package es.ua.dlsi.mejorua.api.business;
 
 import java.util.List;
+import java.util.logging.Logger;
 
+import es.ua.dlsi.mejorua.api.business.IssueEventBO.eventType;
 import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
-import es.ua.dlsi.mejorua.api.persistance.IssueJDBCMySQLDAO;
+import es.ua.dlsi.mejorua.api.persistance.jdbc.mysql.IssueDAO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
 public class IssueBO {
+
+	private static Logger logger = Logger.getLogger("es.ua.dlsi.mejorua.api.business.IssueBO");
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -16,7 +20,10 @@ public class IssueBO {
 	// /////////////////////////////////////////////////////////////////////////////////
 
 	private static IIssueDAO dao;
-	//TODO - REFACTOR - GAIN:Scalability - Extract TO from BO and make all methods static to eliminate 1to1 dependecy between them. BO doens needs to have his own internal state (the TO), just needs know how to work with TO's
+	// TODO - REFACTOR - GAIN:Scalability - Extract TO from BO and make all
+	// methods static to eliminate 1to1 dependecy between them. BO doens needs
+	// to have his own internal state (the TO), just needs know how to work with
+	// TO's
 	private IssueTO to;
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -27,9 +34,9 @@ public class IssueBO {
 
 	// Static constructor
 	static {
-		//dao = new IssueDebugDAO();
-		//dao = new IssueJPADAO();
-		dao = new IssueJDBCMySQLDAO();
+		// dao = new IssueDebugDAO();
+		// dao = new IssueJPADAO();
+		dao = new IssueDAO();
 	}
 
 	// Constructor
@@ -39,9 +46,23 @@ public class IssueBO {
 
 		onCreate();
 	}
-	
+
+	//"Copy" constructor
 	public IssueBO(IssueTO to) {
 		this.to = to;
+	}
+	
+	//Creates IssueBO from partial info (bootstraps IssueEvent collection & assings the partial data) Used to habdle IssueCollection POST
+	public static IssueBO newFromPartialIssueTO(IssueTO to) {
+		IssueBO issueBO = new IssueBO();
+		IssueTO issueTO = issueBO.getTO();
+		
+		issueTO.setAction(to.getAction());
+		issueTO.setTerm(to.getTerm());
+		issueTO.setLatitude(to.getLatitude());
+		issueTO.setLongitude(to.getLongitude());
+		
+		return issueBO;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +70,8 @@ public class IssueBO {
 	// DAO
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
-
+	// TODO Design decision - Decide if BO controlls DAO, or if DAO can be called directly from REST API controllers
+	
 	public static List<IssueTO> getAll() {
 		return dao.getAll();
 	}
@@ -61,7 +83,7 @@ public class IssueBO {
 	public static long add(IssueTO issueTO) {
 
 		long newId = -1;
-		
+
 		IssueBO issueBO = new IssueBO(issueTO);
 
 		if (issueBO.isValid()) {
@@ -73,14 +95,28 @@ public class IssueBO {
 
 	public boolean update() {
 
-		boolean isSaved = false;
+		boolean isUpdated = false;
+		String error = "";
 
-		if (isValid() && get(to.getId()) != null) {
-			dao.update(to);
-			isSaved = true;
+		if (isValid()) {
+			if (get(to.getId()) != null) {
+
+				isUpdated = dao.update(to);
+
+				if (!isUpdated) {
+					logger.info("IssueBO - Couldnt update");
+					isUpdated = false;
+				}
+			} else {
+				logger.info("IssueBO - The issue doesn't exist");
+				isUpdated = false;
+			}
+		} else {
+			logger.info("IssueBO - Invalid data");
+			isUpdated = false;
 		}
 
-		return isSaved;
+		return isUpdated;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -89,27 +125,58 @@ public class IssueBO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
-	public void onCreate() {
+	public IssueEventBO onCreate() {
 
-		IssueEventBO event;
+		boolean isCreated = false;
+		
+		this.to.setState(State.PENDING);
+		
+		IssueEventBO event = new IssueEventBO(to.getId(), eventType.CREATE);
 
-		event = to.getEvents().create();
-		to.setCreationDate(event.getDate());
-		to.setLastModifiedDate(event.getDate());
-	}
+		isCreated = to.getEvents().add(event);
 
-	public boolean onChangeState(State state) {
-
-		IssueEventBO event;
-		boolean isChanged = false;
-
-		if (setState(state)) {
-			event = to.getEvents().changeState(state);
+		if (isCreated) {
+			to.setCreationDate(event.getDate());
 			to.setLastModifiedDate(event.getDate());
-			isChanged = true;
+		} else {
+			event = null;
 		}
 
-		return isChanged;
+		return event;
+	}
+
+	public IssueTO onChangeState(State state) {
+
+		IssueEventBO event = null;
+		IssueTO changedIssueTO = null;
+		State originalState = to.getState();
+		boolean isAdded = false;
+		boolean isError = false;
+
+		if (setState(state)) {
+
+			event = IssueEventBO.newChangeState(to.getId(), state);
+
+			if (event != null) {
+				isAdded = to.getEvents().add(event);
+
+				if (isAdded) {
+					to.setLastModifiedDate(event.getDate());
+					changedIssueTO = to;
+				} else {
+					isError = true;
+				}
+			} else {
+				isError = true;
+			}
+		}
+
+		if (isError) {
+			changedIssueTO = null;
+			setState(originalState);
+		}
+
+		return changedIssueTO;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +244,7 @@ public class IssueBO {
 	public void setTO(IssueTO to) {
 		this.to = to;
 	}
-	
+
 	public boolean setState(State state) {
 
 		boolean isSetted = false;

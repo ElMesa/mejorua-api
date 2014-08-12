@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo "###############################################"
+echo "#"
+echo "# STARTING - Tomcat status"
+echo "#"
+echo "###############################################"
+echo ""
+
+echo "##### PS Stuff: ps -ef | grep --colour=auto -E java.*tomcat #####"
+echo ""
+
+ps -ef | grep --colour=auto -E java.*tomcat
+
+echo ""
+echo "##### CURL Stuff: curl -I localhost:8080 #####"
+echo ""
+
+curl -I localhost:8080
+
+echo ""
+echo "###############################################"
+echo "#"
+echo "# FINISHED - Tomcat status"
+echo "#"
+echo "###############################################"

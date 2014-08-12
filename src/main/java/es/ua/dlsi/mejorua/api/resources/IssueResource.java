@@ -57,31 +57,38 @@ public class IssueResource {
 	public Response post(String resourceJSON, @PathParam("id") String idString) {
 
 		Response response;
-		String error = "No se ha podido crear/modificar el recurso";
-
-		// IssueBO postedIssue = (IssueBO) JSON.decode(resourceJSON,
-		// IssueBO.class);
+		String JSONResponse = "";
+		IssueTO updatedIssue = null;
+		boolean isUpdatePersisted = false;
+		boolean isServerError = false;
+		
+		//TODO API - ERROR HANDLING - Use meaningful and useful errors (without creating security issues related to the info given) Also create documentation and link to it
+		String error = "Error";
 		HashMap<String, Object> dataHash = JSON.decodeToHash(resourceJSON);
 
 		if (dataHash.size() > 0) {
 
-			boolean isChanged = false;
-
-			IssueTO issueTO = IssueBO.get(new Long(idString));
+			IssueTO issueTO = IssueBO.get(Long.valueOf(idString));
 			IssueBO issueBO = new IssueBO(issueTO);
 
+			//Check if state needs update
 			String state = (String) dataHash.get("state");
 			if (state != null) {
-				if (issueBO.onChangeState(State.valueOf(state))) {
-					isChanged = true;
+				updatedIssue = issueBO.onChangeState(State.valueOf(state));
+				
+				if(updatedIssue != null) {
+					isUpdatePersisted = issueBO.update();
+					
+					if(isUpdatePersisted) JSONResponse = JSON.encode(updatedIssue);
+					else {
+						isServerError = true;
+						error = "Server could not persist the data";
+					}
+				} else {
+					isServerError = true;
+					error = "Server could not update the resource";
 				}
 			}
-
-			if (isChanged) {
-				issueBO.update();
-			}
-
-			String JSONResponse = JSON.encode(issueBO.getTO());
 
 			// TODO Componer la uri con la location del recurso creado
 
@@ -89,8 +96,12 @@ public class IssueResource {
 			// String resourceUri = baseUri + "incidencia/" +
 			// incidencia.getId();
 			// response = Response.created(resourceUri).build();
-			response = Response.status(201).entity(JSONResponse).build();
+			
+			if(!isServerError) response = Response.status(201).entity(JSONResponse).build();
+			else response = Response.status(500).entity(error).type("text/plain")
+					.build();
 		} else {
+			//400 - Client error
 			response = Response.status(400).entity(error).type("text/plain")
 					.build();
 		}

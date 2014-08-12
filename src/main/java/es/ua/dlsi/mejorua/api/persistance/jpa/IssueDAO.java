@@ -1,4 +1,4 @@
-package es.ua.dlsi.mejorua.api.persistance;
+package es.ua.dlsi.mejorua.api.persistance.jpa;
 
 import java.util.List;
 
@@ -8,9 +8,10 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 
-public class IssueJPADAO implements IIssueDAO {
+public class IssueDAO implements IIssueDAO {
 
 	private static final String PERSISTANCEUNIT = "es.ua.dlsi.mejorua.api.persistanceUnit.mysql";
 	//private static final String PERSISTANCEUNIT = "es.ua.dlsi.mejorua.api.persistanceUnit.h2";
@@ -18,8 +19,8 @@ public class IssueJPADAO implements IIssueDAO {
 	private EntityManagerFactory emf;
 	private EntityManager em;
 	
-	public IssueJPADAO() {
-		emf = Persistence.createEntityManagerFactory(IssueJPADAO.PERSISTANCEUNIT);
+	public IssueDAO() {
+		emf = Persistence.createEntityManagerFactory(IssueDAO.PERSISTANCEUNIT);
 		em = emf.createEntityManager();
 	}
 	
