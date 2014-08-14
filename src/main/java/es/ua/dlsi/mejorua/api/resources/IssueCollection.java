@@ -16,7 +16,7 @@ import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
 @Path("/issues")
-@Produces("application/json;charset=UTF-8")
+@Produces(RESTAPI.contentTypeJSON)
 public class IssueCollection {
 
 	@Context
@@ -61,7 +61,7 @@ public class IssueCollection {
 	}
 	
 	@POST
-	@Consumes("application/json;charset=UTF-8")
+	@Consumes(RESTAPI.contentTypeJSON)
 	public Response post(String resourceJSON) {
 
 		Response response;

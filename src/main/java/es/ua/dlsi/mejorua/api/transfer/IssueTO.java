@@ -226,6 +226,7 @@ public class IssueTO {
 		float[] aulario2Coords = new float[] { 38.384488f, -0.510120f };
 		float[] bibliotecaGeneralCoords = new float[] { 38.383235f, -0.512158f };
 		float[] eps1Coords = new float[] { 38.386755f, -0.511295f };
+		float[] estanquePatos = new float[] { 38.385632f, -0.518701f };
 
 		issues.add(DEBUGnewIssue(1, State.PENDING, aulario2Coords));
 		issues.add(DEBUGnewIssue(2, State.DONE, bibliotecaGeneralCoords));

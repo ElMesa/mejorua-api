@@ -18,7 +18,7 @@ import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 import es.ua.dlsi.mejorua.api.util.JSON;
 
 @Path("/issues/{id}")
-@Produces("application/json;charset=UTF-8")
+@Produces(RESTAPI.contentTypeJSON)
 public class IssueResource {
 
 	@Context
@@ -52,17 +52,21 @@ public class IssueResource {
 	}
 
 	@POST
-	@Consumes("application/json;charset=UTF-8")
+	@Consumes(RESTAPI.contentTypeJSON)
 	@Produces("*/*")
 	public Response post(String resourceJSON, @PathParam("id") String idString) {
 
 		Response response;
 		String JSONResponse = "";
 		IssueTO updatedIssue = null;
+		// Toggles the update. True if request has attributes to update
+		boolean hasChanges = false;
 		boolean isUpdatePersisted = false;
 		boolean isServerError = false;
-		
-		//TODO API - ERROR HANDLING - Use meaningful and useful errors (without creating security issues related to the info given) Also create documentation and link to it
+
+		// TODO API - ERROR HANDLING - Use meaningful and useful errors (without
+		// creating security issues related to the info given) Also create
+		// documentation and link to it
 		String error = "Error";
 		HashMap<String, Object> dataHash = JSON.decodeToHash(resourceJSON);
 
@@ -71,22 +75,50 @@ public class IssueResource {
 			IssueTO issueTO = IssueBO.get(Long.valueOf(idString));
 			IssueBO issueBO = new IssueBO(issueTO);
 
-			//Check if state needs update
+			// Check if state needs update
 			String state = (String) dataHash.get("state");
 			if (state != null) {
 				updatedIssue = issueBO.onChangeState(State.valueOf(state));
-				
-				if(updatedIssue != null) {
-					isUpdatePersisted = issueBO.update();
-					
-					if(isUpdatePersisted) JSONResponse = JSON.encode(updatedIssue);
-					else {
-						isServerError = true;
-						error = "Server could not persist the data";
-					}
+				if (updatedIssue != null) {
+					hasChanges = true;
 				} else {
 					isServerError = true;
-					error = "Server could not update the resource";
+					error = "Server could not update the resource (BO not updated nor persisted)";
+				}
+			}
+
+			String action = (String) dataHash.get("action");
+			if (action != null) {
+				issueBO.getTO().setAction(action);
+				hasChanges = true;
+			}
+			
+			String term = (String) dataHash.get("term");
+			if (term != null) {
+				issueBO.getTO().setTerm(action);
+				hasChanges = true;
+			}
+			
+			Double longitude = (Double) dataHash.get("longitude");
+			if (longitude != null) {
+				issueBO.getTO().setLongitude(longitude);
+				hasChanges = true;
+			}
+			
+			Double latitude = (Double) dataHash.get("latitude");
+			if (latitude != null) {
+				issueBO.getTO().setLatitude(latitude);
+				hasChanges = true;
+			}
+
+			if (hasChanges) {
+				isUpdatePersisted = issueBO.update();
+
+				if (isUpdatePersisted)
+					JSONResponse = JSON.encode(updatedIssue);
+				else {
+					isServerError = true;
+					error = "Server could not persist the data (BO updated BUT not persisted)";
 				}
 			}
 
@@ -96,12 +128,14 @@ public class IssueResource {
 			// String resourceUri = baseUri + "incidencia/" +
 			// incidencia.getId();
 			// response = Response.created(resourceUri).build();
-			
-			if(!isServerError) response = Response.status(201).entity(JSONResponse).build();
-			else response = Response.status(500).entity(error).type("text/plain")
-					.build();
+			if (!isServerError)
+				response = Response.status(201).entity(JSONResponse)
+						.type(RESTAPI.contentTypeJSON).build();
+			else
+				response = Response.status(500).entity(error)
+						.type("text/plain").build();
 		} else {
-			//400 - Client error
+			// 400 - Client error
 			response = Response.status(400).entity(error).type("text/plain")
 					.build();
 		}
@@ -114,7 +148,7 @@ public class IssueResource {
 	/*
 	 * @PUT
 	 * 
-	 * @Consumes("application/json;charset=UTF-8") public Response put(String
+	 * @Consumes(RESTAPI.contentTypeJSON) public Response put(String
 	 * resourceJSON) {
 	 * 
 	 * Response response; String error =
