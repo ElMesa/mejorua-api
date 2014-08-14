@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import es.ua.dlsi.mejorua.api.business.IssueEventBO.eventType;
+import es.ua.dlsi.mejorua.api.persistance.DAOFactory;
+import es.ua.dlsi.mejorua.api.persistance.DAOFactory.DAOType;
 import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
 import es.ua.dlsi.mejorua.api.persistance.jdbc.mysql.IssueDAO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
@@ -34,9 +36,8 @@ public class IssueBO {
 
 	// Static constructor
 	static {
-		// dao = new IssueDebugDAO();
-		// dao = new IssueJPADAO();
-		dao = new IssueDAO();
+		DAOFactory.setDAOType(DAOType.JDBCMYSQL);
+		dao = DAOFactory.getIssueDAO();
 	}
 
 	// Constructor

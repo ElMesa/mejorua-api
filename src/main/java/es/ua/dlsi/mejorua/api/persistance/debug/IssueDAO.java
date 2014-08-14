@@ -1,17 +1,18 @@
-package es.ua.dlsi.mejorua.api.persistance;
+package es.ua.dlsi.mejorua.api.persistance.debug;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import es.ua.dlsi.mejorua.api.persistance.IIssueDAO;
 import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 
-public class IssueDebugDAO implements IIssueDAO {
+public class IssueDAO implements IIssueDAO {
 
 	private static long nextId = 1;
 	private static HashMap<Long, IssueTO> issues = new HashMap<Long, IssueTO>();
 
-	public IssueDebugDAO() {
+	public IssueDAO() {
 		DEBUGprePopulate();
 	}
 
