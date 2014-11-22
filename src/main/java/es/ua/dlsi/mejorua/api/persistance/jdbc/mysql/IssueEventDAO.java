@@ -64,6 +64,13 @@ public class IssueEventDAO {
 					throw new RuntimeException(e.toString(), e);
 				}
 			}
+			if(con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					throw new RuntimeException(e.toString(), e);
+				}
+			}
 		}
 		return events;
 	}
@@ -108,6 +115,13 @@ public class IssueEventDAO {
 					statement.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
+					throw new RuntimeException(e.toString(), e);
+				}
+			}
+			if(con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
 					throw new RuntimeException(e.toString(), e);
 				}
 			}

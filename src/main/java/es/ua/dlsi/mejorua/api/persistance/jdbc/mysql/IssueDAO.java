@@ -53,12 +53,14 @@ public class IssueDAO implements IIssueDAO {
 				}
 			}
 		} catch (SQLException e) {
+			isError = true;
 			throw new RuntimeException(e.toString(), e);
 		} finally {
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
+					isError = true;
 					throw new RuntimeException(e.toString(), e);
 				}
 			}
@@ -67,6 +69,15 @@ public class IssueDAO implements IIssueDAO {
 					statement.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
+					isError = true;
+					throw new RuntimeException(e.toString(), e);
+				}
+			}
+			if(con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					isError = true;
 					throw new RuntimeException(e.toString(), e);
 				}
 			}
@@ -197,6 +208,14 @@ public class IssueDAO implements IIssueDAO {
 					statement.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
+					throw new RuntimeException(e.toString(), e);
+				}
+			}
+			if(con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					isError = true;
 					throw new RuntimeException(e.toString(), e);
 				}
 			}
