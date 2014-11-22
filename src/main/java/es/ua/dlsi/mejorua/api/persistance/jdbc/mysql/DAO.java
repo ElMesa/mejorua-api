@@ -7,7 +7,10 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 public class DAO {
 
+	private static MysqlDataSource dataSource;
+
 	static {
+		dataSource = new MysqlDataSource();
 		IssueDAO.DEBUGprePopulate();
 	}
 	
@@ -23,6 +26,7 @@ public class DAO {
 		String host = "localhost";
 		String port = "3306";
 
+		//MysqlDataSource dataSource = null;
 		Connection conn = null;
 
 		// Oracle way results in "SQLException: No suitable driver", problem
@@ -54,7 +58,7 @@ public class DAO {
 			throw new RuntimeException(e1.toString(), e1);
 		}
 		*/
-		MysqlDataSource dataSource = new MysqlDataSource();
+		//MysqlDataSource dataSource = new MysqlDataSource(); //Passed to static constructor to reuse it and avoid MySQLNonTransientConnectionException on runtime on getConnection
 		
 		dataSource.setUser(user);
 		dataSource.setPassword(password);

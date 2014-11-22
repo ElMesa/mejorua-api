@@ -73,67 +73,74 @@ public class IssueResource {
 		if (dataHash.size() > 0) {
 
 			IssueTO issueTO = IssueBO.get(Long.valueOf(idString));
-			IssueBO issueBO = new IssueBO(issueTO);
 
-			// Check if state needs update
-			String state = (String) dataHash.get("state");
-			if (state != null) {
-				updatedIssue = issueBO.onChangeState(State.valueOf(state));
-				if (updatedIssue != null) {
+			if (issueTO != null) {
+				IssueBO issueBO = new IssueBO(issueTO);
+
+				// Check if state needs update
+				String state = (String) dataHash.get("state");
+				if (state != null) {
+					updatedIssue = issueBO.onChangeState(State.valueOf(state));
+					if (updatedIssue != null) {
+						hasChanges = true;
+					} else {
+						isServerError = true;
+						error = "Server could not update the resource (BO not updated nor persisted)";
+					}
+				}
+
+				String action = (String) dataHash.get("action");
+				if (action != null) {
+					issueBO.getTO().setAction(action);
 					hasChanges = true;
-				} else {
-					isServerError = true;
-					error = "Server could not update the resource (BO not updated nor persisted)";
 				}
-			}
 
-			String action = (String) dataHash.get("action");
-			if (action != null) {
-				issueBO.getTO().setAction(action);
-				hasChanges = true;
-			}
-			
-			String term = (String) dataHash.get("term");
-			if (term != null) {
-				issueBO.getTO().setTerm(action);
-				hasChanges = true;
-			}
-			
-			Double longitude = (Double) dataHash.get("longitude");
-			if (longitude != null) {
-				issueBO.getTO().setLongitude(longitude);
-				hasChanges = true;
-			}
-			
-			Double latitude = (Double) dataHash.get("latitude");
-			if (latitude != null) {
-				issueBO.getTO().setLatitude(latitude);
-				hasChanges = true;
-			}
-
-			if (hasChanges) {
-				isUpdatePersisted = issueBO.update();
-
-				if (isUpdatePersisted)
-					JSONResponse = JSON.encode(updatedIssue);
-				else {
-					isServerError = true;
-					error = "Server could not persist the data (BO updated BUT not persisted)";
+				String term = (String) dataHash.get("term");
+				if (term != null) {
+					issueBO.getTO().setTerm(action);
+					hasChanges = true;
 				}
-			}
 
-			// TODO Componer la uri con la location del recurso creado
+				Double longitude = (Double) dataHash.get("longitude");
+				if (longitude != null) {
+					issueBO.getTO().setLongitude(longitude);
+					hasChanges = true;
+				}
 
-			// String baseUri = uri.getBaseUri().toString();
-			// String resourceUri = baseUri + "incidencia/" +
-			// incidencia.getId();
-			// response = Response.created(resourceUri).build();
-			if (!isServerError)
-				response = Response.status(201).entity(JSONResponse)
-						.type(RESTAPI.contentTypeJSON).build();
-			else
-				response = Response.status(500).entity(error)
+				Double latitude = (Double) dataHash.get("latitude");
+				if (latitude != null) {
+					issueBO.getTO().setLatitude(latitude);
+					hasChanges = true;
+				}
+
+				if (hasChanges) {
+					isUpdatePersisted = issueBO.update();
+
+					if (isUpdatePersisted)
+						JSONResponse = JSON.encode(updatedIssue);
+					else {
+						isServerError = true;
+						error = "Server could not persist the data (BO updated BUT not persisted)";
+					}
+				}
+
+				// TODO Componer la uri con la location del recurso creado
+
+				// String baseUri = uri.getBaseUri().toString();
+				// String resourceUri = baseUri + "incidencia/" +
+				// incidencia.getId();
+				// response = Response.created(resourceUri).build();
+				if (!isServerError)
+					response = Response.status(201).entity(JSONResponse)
+							.type(RESTAPI.contentTypeJSON).build();
+				else
+					response = Response.status(500).entity(error)
+							.type("text/plain").build();
+			} else {
+				// Resource not found (bad id)
+				response = Response.status(404).entity(error)
 						.type("text/plain").build();
+			}
 		} else {
 			// 400 - Client error
 			response = Response.status(400).entity(error).type("text/plain")
@@ -145,6 +152,8 @@ public class IssueResource {
 	}
 
 	// TODO Solucionar error de unsuported media type al mandar JSON
+	//Maybe helpful: http://www.codereye.com/2010/12/configure-tomcat-to-accept-http-put.html
+	//But remember some problems with Chrome and PUT also
 	/*
 	 * @PUT
 	 * 
