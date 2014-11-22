@@ -4,20 +4,19 @@
 	version="1.0"> -->
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
-http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
 	version="2.1">
 
-    <persistence-unit name="es.ua.dlsi.mejorua.api.persistanceUnit.mysql">
+	<persistence-unit name="es.ua.dlsi.mejorua.api.persistanceUnit.mysql">
 
-        <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
-        
+		<provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
+
 		<class>es.ua.dlsi.mejorua.api.transfer.IssueTO</class>
 		<class>es.ua.dlsi.mejorua.api.business.IssueEventBO</class>
 		<exclude-unlisted-classes />
 
 		<properties>
-		    
+
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/mejorua" />
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="javax.persistence.jdbc.user" value="mejorua" />
@@ -26,7 +25,7 @@ http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
 			<property name="datanucleus.schema.autoCreateAll" value="true" />
 		</properties>
 	</persistence-unit>
-	
+
 	<persistence-unit name="es.ua.dlsi.mejorua.api.persistanceUnit.h2">
 
 		<class>es.ua.dlsi.mejorua.api.business.IssueTO</class>

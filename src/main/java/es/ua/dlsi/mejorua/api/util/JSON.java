@@ -70,7 +70,7 @@ public class JSON {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("JSON.decodeToHash = " + o);
+		//System.out.println("JSON.decodeToHash = " + o);
 
 		return o;
 	}

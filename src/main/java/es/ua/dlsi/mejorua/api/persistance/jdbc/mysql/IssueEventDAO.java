@@ -31,7 +31,7 @@ public class IssueEventDAO {
 		
 		con = DAO.getConnection();
 
-		SQL_SELECT = "SELECT * FROM ISSUEEVENTBO WHERE ISSUETOID = " + issueId;
+		SQL_SELECT = "SELECT * FROM ISSUEEVENTBO WHERE ISSUEID = " + issueId;
 
 		try {
 			statement = con.createStatement();
@@ -40,9 +40,9 @@ public class IssueEventDAO {
 				event = new IssueEventBO();
 				event.setId(rs.getLong("ID"));
 				event.setType(IssueEventBO.eventType.getType(rs
-						.getInt("EVENTTYPE")));
+						.getInt("TYPE")));
 				event.setDate(rs.getLong("DATE"));
-				event.setIssueId(rs.getLong("ISSUETOID"));
+				event.setIssueId(rs.getLong("ISSUEID"));
 
 				events.add(event);
 			}
@@ -81,7 +81,7 @@ public class IssueEventDAO {
 
 		con = DAO.getConnection();
 
-		SQL_CREATE = "INSERT INTO `mejorua`.`ISSUEEVENTBO` (`EVENTTYPE`, `DATE`, `ISSUETOID`) VALUES (?, ?, ?)";
+		SQL_CREATE = "INSERT INTO `mejorua`.`ISSUEEVENTBO` (`TYPE`, `DATE`, `ISSUEID`) VALUES (?, ?, ?)";
 		try {
 			statement = con.prepareStatement(SQL_CREATE,
 					Statement.RETURN_GENERATED_KEYS);

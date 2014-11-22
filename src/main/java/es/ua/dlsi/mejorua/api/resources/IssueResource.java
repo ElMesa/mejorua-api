@@ -52,6 +52,7 @@ public class IssueResource {
 	}
 
 	@POST
+	//@PUT
 	@Consumes(RESTAPI.contentTypeJSON)
 	@Produces("*/*")
 	public Response post(String resourceJSON, @PathParam("id") String idString) {
@@ -97,7 +98,7 @@ public class IssueResource {
 
 				String term = (String) dataHash.get("term");
 				if (term != null) {
-					issueBO.getTO().setTerm(action);
+					issueBO.getTO().setTerm(term);
 					hasChanges = true;
 				}
 
@@ -110,6 +111,12 @@ public class IssueResource {
 				Double latitude = (Double) dataHash.get("latitude");
 				if (latitude != null) {
 					issueBO.getTO().setLatitude(latitude);
+					hasChanges = true;
+				}
+				
+				String idSIGUA = (String) dataHash.get("idSIGUA");
+				if (latitude != null) {
+					issueBO.getTO().setIdSIGUA(idSIGUA);
 					hasChanges = true;
 				}
 

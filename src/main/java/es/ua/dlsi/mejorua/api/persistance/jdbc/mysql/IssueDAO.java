@@ -92,7 +92,7 @@ public class IssueDAO implements IIssueDAO {
 		ResultSet generatedKeys = null;
 
 		con = DAO.getConnection();
-		String SQL_CREATE = "INSERT INTO `ISSUETO` (`ACTION`, `CREATIONDATE`, `LASTMODIFIEDDATE`, `LATITUDE`, `LONGITUDE`, `STATE`, `TERM`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String SQL_CREATE = "INSERT INTO `ISSUETO` (`ACTION`, `CREATIONDATE`, `LASTMODIFIEDDATE`, `LATITUDE`, `LONGITUDE`, `STATE`, `TERM`, `IDSIGUA`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try {
 			// TODO Substitute with named parameters preparedStatement:
@@ -106,6 +106,7 @@ public class IssueDAO implements IIssueDAO {
 			statement.setDouble(5, issue.getLongitude());
 			statement.setInt(6, issue.getState().getId());
 			statement.setString(7, issue.getTerm());
+			statement.setString(8, issue.getIdSIGUA());
 
 			int affectedRows = statement.executeUpdate();
 			if (affectedRows > 0) {
@@ -295,6 +296,7 @@ public class IssueDAO implements IIssueDAO {
 		issue.setLastModifiedDate(rs.getLong("LASTMODIFIEDDATE"));
 		issue.setLatitude(rs.getDouble("LATITUDE"));
 		issue.setLongitude(rs.getDouble("LONGITUDE"));
+		issue.setIdSIGUA(rs.getString("IDSIGUA"));
 
 		events = eventDAO.getAllFromIssue(rs.getLong("ID"));
 

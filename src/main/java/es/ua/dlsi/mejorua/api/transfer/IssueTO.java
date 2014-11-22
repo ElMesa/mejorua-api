@@ -1,6 +1,7 @@
 package es.ua.dlsi.mejorua.api.transfer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -18,6 +19,7 @@ import es.ua.dlsi.mejorua.api.business.IssueEventBO;
 import es.ua.dlsi.mejorua.api.business.geojson.FeatureBO;
 
 @Entity
+//@IdClass(class=SingleFieldIdentity.class)
 public class IssueTO {
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -67,6 +69,9 @@ public class IssueTO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
+	@OneToMany(orphanRemoval = true)
+	//@JoinColumn(name = "ISSUE_ID", referencedColumnName="ID")
+	@JoinColumn(name = "ISSUEID")
 	private List<IssueEventBO> events;
 	private FeatureBO geoJSONFeature; // Derived atribute - IssueBO in geoJSON
 										// Notation
@@ -93,6 +98,8 @@ public class IssueTO {
 	private double latitude;
 	@Basic
 	private double longitude;
+	@Basic
+	private String idSIGUA;
 
 	@Basic
 	private long creationDate; // Derived attribute - From first create event
@@ -187,8 +194,9 @@ public class IssueTO {
 
 	
 	@JsonProperty(value = "events")
-	@OneToMany(orphanRemoval = true)
-	@JoinColumn(name = "ISSUE_EVENT_ID")
+	//@OneToMany(orphanRemoval = true)
+	//@JoinColumn(name = "ISSUE_ID", referencedColumnName="ID")
+	//@JoinColumn(name = "ISSUE_ID")
 	public List<IssueEventBO> getEvents() {
 		return events;
 	}
@@ -213,6 +221,14 @@ public class IssueTO {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
+	public String getIdSIGUA() {
+		return idSIGUA;
+	}
+
+	public void setIdSIGUA(String idSIGUA) {
+		this.idSIGUA = idSIGUA;
+	}
+	
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
 	// DEBUG
@@ -223,29 +239,73 @@ public class IssueTO {
 
 		ArrayList<IssueTO> issues = new ArrayList<IssueTO>();
 		
-		float[] aulario2Coords = new float[] { 38.384488f, -0.510120f };
-		float[] bibliotecaGeneralCoords = new float[] { 38.383235f, -0.512158f };
-		float[] eps1Coords = new float[] { 38.386755f, -0.511295f };
-		float[] estanquePatos = new float[] { 38.385632f, -0.518701f };
+//		float[] aulario2Coords = new float[] { 38.384488f, -0.510120f };
+//		float[] bibliotecaGeneralCoords = new float[] { 38.383235f, -0.512158f };
+//		float[] eps1Coords = new float[] { 38.386755f, -0.511295f };
+//		float[] estanquePatos = new float[] { 38.385632f, -0.518701f };
+//
+//		issues.add(DEBUGnewIssue(1, State.PENDING, aulario2Coords));
+//		issues.add(DEBUGnewIssue(2, State.DONE, bibliotecaGeneralCoords));
+//		issues.add(DEBUGnewIssue(3, State.INPROGRESS, eps1Coords));
+		
+		HashMap<String,String> A2SalonActos = new HashMap<String,String>();
+		A2SalonActos.put("id", "1");
+		A2SalonActos.put("name", "A2SalonActos");
+		A2SalonActos.put("state", "PENDING");
+		A2SalonActos.put("latitude", "38.38443437317912");
+		A2SalonActos.put("longitude", "-0.5099328607320786");
+		A2SalonActos.put("idSIGUA", "0030PB010");
+		
+		HashMap<String,String> BibliotecaGeneralPatio = new HashMap<String,String>();
+		BibliotecaGeneralPatio.put("id", "2");
+		BibliotecaGeneralPatio.put("name", "BibliotecaGeneralPatio");
+		BibliotecaGeneralPatio.put("state", "DONE");
+		BibliotecaGeneralPatio.put("latitude", "38.38325171727514");
+		BibliotecaGeneralPatio.put("longitude", "-0.5119830742478371");
+		BibliotecaGeneralPatio.put("idSIGUA", "0033PB040");
 
-		issues.add(DEBUGnewIssue(1, State.PENDING, aulario2Coords));
-		issues.add(DEBUGnewIssue(2, State.DONE, bibliotecaGeneralCoords));
-		issues.add(DEBUGnewIssue(3, State.INPROGRESS, eps1Coords));
-
+		HashMap<String,String> EPS1LibreAcceso = new HashMap<String,String>();
+		EPS1LibreAcceso.put("id", "3");
+		EPS1LibreAcceso.put("name", "EPS1LibreAcceso");
+		EPS1LibreAcceso.put("state", "INPROGRESS");
+		EPS1LibreAcceso.put("latitude", "38.386904221968365");
+		EPS1LibreAcceso.put("longitude", "-0.511702112853527");
+		EPS1LibreAcceso.put("idSIGUA", "0016PB054");
+		
+		issues.add(DEBUGnewIssueFromHash(A2SalonActos));
+		issues.add(DEBUGnewIssueFromHash(BibliotecaGeneralPatio));
+		issues.add(DEBUGnewIssueFromHash(EPS1LibreAcceso));
+		
 		return issues;
 	}
 
-	private static IssueTO DEBUGnewIssue(int id, State state, float[] coordinates) {
+//	private static IssueTO DEBUGnewIssue(int id, State state, float[] coordinates) {
+//		IssueBO issueBO = new IssueBO();
+//		IssueTO issueTO = issueBO.getTO();
+//
+//		issueTO.setId(id);
+//		issueTO.setState(state);
+//		issueTO.setTerm(id + " PrePopulated Term");
+//		issueTO.setAction(id + " PrePopulated Action");
+//
+//		issueTO.setLatitude(coordinates[0]);
+//		issueTO.setLongitude(coordinates[1]);
+//
+//		return issueTO;
+//	}
+	
+	private static IssueTO DEBUGnewIssueFromHash(HashMap<String,String> data) {
 		IssueBO issueBO = new IssueBO();
 		IssueTO issueTO = issueBO.getTO();
 
-		issueTO.setId(id);
-		issueTO.setState(state);
-		issueTO.setTerm(id + " PrePopulated Term");
-		issueTO.setAction(id + " PrePopulated Action");
+		issueTO.setId(Integer.valueOf(data.get("id")));
+		issueTO.setState(State.valueOf(data.get("state")));
+		issueTO.setTerm(data.get("id") + "-" + data.get("name") + " - Term");
+		issueTO.setAction(data.get("id") + "-" + data.get("name") + " - Action");
 
-		issueTO.setLatitude(coordinates[0]);
-		issueTO.setLongitude(coordinates[1]);
+		issueTO.setLatitude(Double.valueOf(data.get("latitude")));
+		issueTO.setLongitude(Double.valueOf(data.get("longitude")));
+		issueTO.setIdSIGUA(data.get("idSIGUA"));
 
 		return issueTO;
 	}

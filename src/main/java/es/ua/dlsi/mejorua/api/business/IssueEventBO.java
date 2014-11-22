@@ -8,10 +8,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
 @Entity
+//@IdClass(class=SingleFieldIdentity.class)
 public class IssueEventBO {
 
 	// /////////////////////////////////////////////////////////////////////////////////
@@ -68,8 +70,13 @@ public class IssueEventBO {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "ISSUE_EVENT_ID")
+	//@Column(name = "ISSUE_EVENT_ID")
 	private long id;
+	
+	//@Basic
+	//@Column(name = "ISSUE_ID")
+	//mvn private long idIssue;
+	
 	@Basic
 	private eventType type;
 	@Basic
