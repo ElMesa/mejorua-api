@@ -4,7 +4,8 @@ import java.util.HashMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+//import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -51,8 +52,8 @@ public class IssueResource {
 		return response;
 	}
 
-	@POST
-	//@PUT
+	//@POST
+	@PUT
 	@Consumes(RESTAPI.contentTypeJSON)
 	@Produces("*/*")
 	public Response post(String resourceJSON, @PathParam("id") String idString) {
@@ -80,7 +81,8 @@ public class IssueResource {
 
 				// Check if state needs update
 				String state = (String) dataHash.get("state");
-				if (state != null) {
+				String statePersisted = issueBO.getTO().getState().toString();
+				if (state != null && !state.equals(statePersisted)) {
 					updatedIssue = issueBO.onChangeState(State.valueOf(state));
 					if (updatedIssue != null) {
 						hasChanges = true;
@@ -121,9 +123,10 @@ public class IssueResource {
 				}
 
 				if (hasChanges) {
-					isUpdatePersisted = issueBO.update();
+					issueBO.getTO().setLastModifiedDate(System.currentTimeMillis());
+					updatedIssue = issueBO.update();
 
-					if (isUpdatePersisted)
+					if (updatedIssue != null)
 						JSONResponse = JSON.encode(updatedIssue);
 					else {
 						isServerError = true;

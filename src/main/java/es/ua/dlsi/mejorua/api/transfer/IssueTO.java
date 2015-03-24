@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -69,7 +70,7 @@ public class IssueTO {
 	//
 	// /////////////////////////////////////////////////////////////////////////////////
 
-	@OneToMany(orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
 	//@JoinColumn(name = "ISSUE_ID", referencedColumnName="ID")
 	@JoinColumn(name = "ISSUEID")
 	private List<IssueEventBO> events;

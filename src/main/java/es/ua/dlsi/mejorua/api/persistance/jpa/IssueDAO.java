@@ -14,13 +14,23 @@ import es.ua.dlsi.mejorua.api.transfer.IssueTO;
 public class IssueDAO implements IIssueDAO {
 
 	private static final String PERSISTANCEUNIT = "es.ua.dlsi.mejorua.api.persistanceUnit.mysql";
-	//private static final String PERSISTANCEUNIT = "es.ua.dlsi.mejorua.api.persistanceUnit.h2";
+	private static final String PERSISTANCEUNIT_TEST = "es.ua.dlsi.mejorua.api.persistanceUnit.h2";
 	
 	private EntityManagerFactory emf;
 	private EntityManager em;
 	
 	public IssueDAO() {
-		emf = Persistence.createEntityManagerFactory(IssueDAO.PERSISTANCEUNIT);
+		this(false); 
+	}
+	
+	public IssueDAO(Boolean isTestMode) {
+		String persistanceUnit;
+		if(isTestMode) {
+			persistanceUnit = PERSISTANCEUNIT_TEST;
+		} else {
+			persistanceUnit = PERSISTANCEUNIT;
+		}
+		emf = Persistence.createEntityManagerFactory(persistanceUnit);
 		em = emf.createEntityManager();
 	}
 	
@@ -31,7 +41,7 @@ public class IssueDAO implements IIssueDAO {
 		List<IssueTO> allIssues = (List<IssueTO>) query.getResultList();
 		
 		//Detach objets from entity manager
-		em.clear();
+		//em.clear();
 		
 		return allIssues;
 	}
@@ -48,7 +58,7 @@ public class IssueDAO implements IIssueDAO {
 		tx.commit();
 		
 		//Detach objets from entity manager
-		em.clear();
+		//em.clear();
 		
 		issueId = issue.getId();
 
@@ -64,7 +74,7 @@ public class IssueDAO implements IIssueDAO {
 	}
 
 	// TODO - IMPLEMENNT
-	public boolean update(IssueTO issue) {
+	public IssueTO update(IssueTO issue) {
 		
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
@@ -74,8 +84,8 @@ public class IssueDAO implements IIssueDAO {
 		tx.commit();
 		
 		//Detach objets from entity manager
-		em.clear();
+		//em.clear();
 		
-		return false;
+		return issue;
 	}
 }

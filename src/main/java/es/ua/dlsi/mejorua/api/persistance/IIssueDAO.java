@@ -32,7 +32,7 @@ public interface IIssueDAO {
 	public IssueTO get(long id);
 	
 	// Update
-	public boolean update(IssueTO issue);
+	public IssueTO update(IssueTO issue);
 	
 	// Delete - NOT ALLOWED - Nowadays issues only change state, there is no delete functionality
 }

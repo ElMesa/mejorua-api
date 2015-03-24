@@ -230,7 +230,7 @@ public class IssueDAO implements IIssueDAO {
 
 	// Update
 	//TODO Implement a better partial update. Now IssueResource gets from DB the persisted issue, changes partially, and then makes a full update. It would be better to just "SQL UPDATE SET" the changed atributes to avoid the first BD GET.
-	public boolean update(IssueTO issue) {
+	public IssueTO update(IssueTO issue) {
 
 		IssueEventDAO eventDAO = null;
 		boolean isUpdated = true;
@@ -299,7 +299,7 @@ public class IssueDAO implements IIssueDAO {
 			}
 		}
 
-		return isUpdated;
+		return issue;
 	}
 
 	private IssueTO newIssueFromResultset(ResultSet rs) throws SQLException {

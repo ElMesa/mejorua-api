@@ -8,7 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
+import javax.persistence.Transient;
 
 import es.ua.dlsi.mejorua.api.transfer.IssueTO.State;
 
@@ -60,7 +60,7 @@ public class IssueEventBO {
 	// /////////////////////////////////////////////////////////////////////////////////
 
 	// {IssueTO} id
-	long issueId;
+	//long issueId;
 
 	// /////////////////////////////////////////////////////////////////////////////////
 	//
@@ -70,15 +70,18 @@ public class IssueEventBO {
 
 	@Id
 	@GeneratedValue
-	//@Column(name = "ISSUE_EVENT_ID")
 	private long id;
 	
+	//Commented because: Using unidirectional @oneToMany 
 	//@Basic
 	//@Column(name = "ISSUE_ID")
-	//mvn private long idIssue;
+	//private long idIssue;
 	
 	@Basic
-	private eventType type;
+	//@Transient
+	//private eventType type;
+	private Integer type;
+	
 	@Basic
 	private long date;
 
@@ -120,10 +123,10 @@ public class IssueEventBO {
 	}
 
 	public IssueEventBO(long issueId, eventType type) {
-		this.issueId = issueId;
+		//this.issueId = issueId;
 		date = System.currentTimeMillis();
 
-		this.type = type;
+		this.setType(type);
 	}
 
 	public static IssueEventBO newChangeState(long issueId, State state) {
@@ -172,12 +175,28 @@ public class IssueEventBO {
 	}
 
 	public eventType getType() {
-		return type;
+		return eventType.getType(this.type);
 	}
-
+	
 	public void setType(eventType type) {
-		this.type = type;
+		this.type = type.getId();
 	}
+	
+	/*
+	BUG - Datanucleus enhancer crashes
+	when triying to persist the Enum id via this getter and setter as seen in: (http://www.datanucleus.org/products/accessplatform_3_3/jpa/fields_properties.html)
+	Exception: "Class es.ua.dlsi.mejorua.api.business.IssueEventBO has application-identity and no objectid-class specified yet has [Ljava.lang.Object;@69e0b7a2 primary key fields. Unable to use SingleFieldIdentity."
+	
+	@Basic
+	@Column(name = "TYPE")
+	public int getTypeId() {
+		return type.getId();
+	}
+	
+	public void setTypeId(int typeId) {
+		this.type = eventType.getType(typeId);
+	}
+	*/
 
 	public long getDate() {
 		return date;
@@ -188,11 +207,12 @@ public class IssueEventBO {
 	}
 
 	public long getIssueId() {
-		return issueId;
+		//return issueId;
+		return -1;
 	}
 
 	public void setIssueId(long issueId) {
-		this.issueId = issueId;
+		//this.issueId = issueId;
 	}
 
 }

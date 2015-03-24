@@ -39,7 +39,7 @@ public class IssueDAO implements IIssueDAO {
 		return newId;
 	}
 
-	public boolean update(IssueTO issue) {
+	public IssueTO update(IssueTO issue) {
 
 		boolean isUpdated = false;
 
@@ -48,7 +48,7 @@ public class IssueDAO implements IIssueDAO {
 			isUpdated = true;
 		}
 
-		return isUpdated;
+		return issue;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////

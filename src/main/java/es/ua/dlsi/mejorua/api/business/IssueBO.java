@@ -36,7 +36,7 @@ public class IssueBO {
 
 	// Static constructor
 	static {
-		DAOFactory.setDAOType(DAOType.JDBCMYSQL);
+		DAOFactory.setDAOType(DAOType.JPA);
 		dao = DAOFactory.getIssueDAO();
 	}
 
@@ -58,10 +58,17 @@ public class IssueBO {
 		IssueBO issueBO = new IssueBO();
 		IssueTO issueTO = issueBO.getTO();
 		
-		issueTO.setAction(to.getAction());
-		issueTO.setTerm(to.getTerm());
-		issueTO.setLatitude(to.getLatitude());
-		issueTO.setLongitude(to.getLongitude());
+		//TODO - REFACTOR - IssueTO double to Double, so here we can check for null
+		if(to.getAction() != null && to.getTerm() != null && /*to.getLatitude() != null && to.getLongitude() != null &&*/ to.getIdSIGUA() != null) {
+	
+			issueTO.setAction(to.getAction());
+			issueTO.setTerm(to.getTerm());
+			issueTO.setLatitude(to.getLatitude());
+			issueTO.setLongitude(to.getLongitude());
+			issueTO.setIdSIGUA(to.getIdSIGUA());
+		} else {
+			issueBO = null;
+		}
 		
 		return issueBO;
 	}
@@ -94,17 +101,18 @@ public class IssueBO {
 		return newId;
 	}
 
-	public boolean update() {
+	public IssueTO update() {
 
-		boolean isUpdated = false;
+		Boolean isUpdated = false;
+		IssueTO updatedIssue = null;
 		String error = "";
 
 		if (isValid()) {
 			if (get(to.getId()) != null) {
 
-				isUpdated = dao.update(to);
+				updatedIssue = dao.update(to);
 
-				if (!isUpdated) {
+				if (updatedIssue == null) {
 					logger.info("IssueBO - Couldnt update");
 					isUpdated = false;
 				}
@@ -117,7 +125,7 @@ public class IssueBO {
 			isUpdated = false;
 		}
 
-		return isUpdated;
+		return updatedIssue;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////
