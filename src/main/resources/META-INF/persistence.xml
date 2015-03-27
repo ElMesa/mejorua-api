@@ -12,6 +12,7 @@
 		<provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
 
 		<class>es.ua.dlsi.mejorua.api.transfer.IssueTO</class>
+		<class>es.ua.dlsi.mejorua.api.transfer.IssueTargetTO</class>
 		<class>es.ua.dlsi.mejorua.api.business.IssueEventBO</class>
 		<exclude-unlisted-classes />
 

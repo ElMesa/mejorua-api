@@ -6,7 +6,12 @@ echo "# STARTING - Tomcat - Remote debugging ready"
 echo "#"
 echo "###############################################"
 
+#tomcat remote debugging enabled
 export JPDA_OPTS="-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
+
+#BUG SOLVER - Prevent PermSize exception (http://stackoverflow.com/questions/4827544/java-lang-outofmemoryerror-permgen-space) & (http://stackoverflow.com/questions/11341494/how-do-i-properly-set-the-permgen-size)
+#export CATALINA_OPTS="$CATALINA_OPTS -server -Xms256m -Xmx1024m -XX:PermSize=512m -XX:MaxPermSize=512m"
+export CATALINA_OPTS="-server -Xms256m -Xmx1024m -XX:PermSize=512m -XX:MaxPermSize=512m"
 
 cd $CATALINA_HOME/bin
 

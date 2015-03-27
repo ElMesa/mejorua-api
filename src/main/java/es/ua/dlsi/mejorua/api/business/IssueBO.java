@@ -59,13 +59,15 @@ public class IssueBO {
 		IssueTO issueTO = issueBO.getTO();
 		
 		//TODO - REFACTOR - IssueTO double to Double, so here we can check for null
-		if(to.getAction() != null && to.getTerm() != null && /*to.getLatitude() != null && to.getLongitude() != null &&*/ to.getIdSIGUA() != null) {
+		//TODO - REFACTOR - Create a validation function for this check
+		if(to.getAction() != null && to.getTarget() != null && /*to.getLatitude() != null && to.getLongitude() != null &&*/ to.getIdSIGUA() != null) {
 	
 			issueTO.setAction(to.getAction());
 			issueTO.setTerm(to.getTerm());
 			issueTO.setLatitude(to.getLatitude());
 			issueTO.setLongitude(to.getLongitude());
 			issueTO.setIdSIGUA(to.getIdSIGUA());
+			issueTO.setTarget(to.getTarget());;
 		} else {
 			issueBO = null;
 		}

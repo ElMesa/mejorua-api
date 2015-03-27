@@ -11,7 +11,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -86,6 +88,10 @@ public class IssueTO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
+	
+	@OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true) @MapsId
+	IssueTargetTO target;
 
 	@Basic
 	private Integer state;
@@ -228,6 +234,14 @@ public class IssueTO {
 
 	public void setIdSIGUA(String idSIGUA) {
 		this.idSIGUA = idSIGUA;
+	}
+	
+	public IssueTargetTO getTarget() {
+		return target;
+	}
+
+	public void setTarget(IssueTargetTO target) {
+		this.target = target;
 	}
 	
 	// /////////////////////////////////////////////////////////////////////////////////
